@@ -15,8 +15,6 @@ namespace NutikasPaevik.Converters
                 if (status.ToLower().Contains("fail") || status.ToLower().Contains("error") || status.ToLower().Contains("ошибка"))
                     return Colors.Red;
             }
-            // Цвет по умолчанию для обычных сообщений или если DynamicResource не сработает
-            // Лучше использовать DynamicResource, если определены цвета для статусов в App.xaml
             return Application.Current.RequestedTheme == AppTheme.Dark ? Colors.LightGray : Colors.DarkGray;
         }
 

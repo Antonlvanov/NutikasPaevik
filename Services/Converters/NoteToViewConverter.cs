@@ -56,7 +56,7 @@ namespace NutikasPaevik
                     Aspect = Aspect.Fill,
                     HorizontalOptions = LayoutOptions.FillAndExpand,
                     VerticalOptions = LayoutOptions.FillAndExpand,
-                    Source = ImageSource.FromFile("bluenote.png") // Запасное изображение
+                    Source = ImageSource.FromFile("bluenote.png")
                 };
                 image.SetBinding(Image.SourceProperty, new Binding("NoteColor", converter: _imageConverter));
 
@@ -245,12 +245,11 @@ namespace NutikasPaevik
             {
                 if (value is double width)
                 {
-                    // Учитываем отступы: 10 (Spacing в HorizontalStackLayout) + 20 (Padding в StackLayout: 10 слева + 10 справа)
                     var totalHorizontalSpacing = 10 + 20;
                     var result = (width - totalHorizontalSpacing) / 2;
-                    return result < 50 ? 50 : result; // Минимальная ширина 50
+                    return result < 50 ? 50 : result;
                 }
-                return 50; // Значение по умолчанию
+                return 50;
             }
             catch (Exception ex)
             {

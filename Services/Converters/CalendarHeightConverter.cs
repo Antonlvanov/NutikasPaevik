@@ -10,11 +10,8 @@ namespace NutikasPaevik
         {
             if (value is double pageHeight)
             {
-                // Вычитаем примерную высоту заголовков (месяц ~50, дни недели ~40)
                 double availableHeight = pageHeight - 200;
-                // Делим на 6 строк (6 недель)
                 double rowHeight = availableHeight / 6;
-                // Возвращаем общую высоту для CollectionView (6 строк)
                 return rowHeight;
             }
             return 0;
