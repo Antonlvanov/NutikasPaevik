@@ -1,0 +1,83 @@
+---- ----------------------------
+---- Таблица: users
+---- ----------------------------
+--CREATE TABLE `users` (
+--  `id` int(11) NOT NULL AUTO_INCREMENT,
+--  `username` varchar(50) NOT NULL,
+--  `email` varchar(100) NOT NULL,
+--  `password_hash` varchar(255) NOT NULL,
+--  `created_at` timestamp NULL DEFAULT current_timestamp(),
+--  PRIMARY KEY (`id`),
+--  UNIQUE KEY `email` (`email`)
+--) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci AUTO_INCREMENT=7;
+
+---- ----------------------------
+---- Таблица: user_actions
+---- ----------------------------
+--CREATE TABLE `user_actions` (
+--  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+--  `user_id` bigint(20) DEFAULT NULL,
+--  `action` varchar(255) NOT NULL,
+--  `endpoint` varchar(255) NOT NULL,
+--  `details` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`details`)),
+--  `created_at` timestamp NULL DEFAULT current_timestamp(),
+--  PRIMARY KEY (`id`)
+--) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci AUTO_INCREMENT=1928;
+
+---- ----------------------------
+---- Таблица: notes_metadata
+---- ----------------------------
+--CREATE TABLE `notes_metadata` (
+--  `SyncId` varchar(36) NOT NULL,
+--  `UserID` int(11) NOT NULL,
+--  `CreationTime` datetime NOT NULL,
+--  `ModifyTime` datetime DEFAULT NULL,
+--  `LastSyncTime` datetime DEFAULT NULL,
+--  `Status` enum('created','updated','deleted') DEFAULT 'created',
+--  PRIMARY KEY (`SyncId`),
+--  KEY `UserID` (`UserID`),
+--  CONSTRAINT `notes_metadata_ibfk_1` FOREIGN KEY (`UserID`) REFERENCES `users` (`id`)
+--) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+---- ----------------------------
+---- Таблица: notes_content
+---- ----------------------------
+--CREATE TABLE `notes_content` (
+--  `SyncId` varchar(36) NOT NULL,
+--  `Title` varchar(255) NOT NULL,
+--  `Content` text NOT NULL,
+--  `NoteColor` int(11) NOT NULL,
+--  `NotifyTime` datetime DEFAULT NULL,
+--  PRIMARY KEY (`SyncId`),
+--  CONSTRAINT `notes_content_ibfk_1` FOREIGN KEY (`SyncId`) REFERENCES `notes_metadata` (`SyncId`)
+--) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+---- ----------------------------
+---- Таблица: events_metadata
+---- ----------------------------
+--CREATE TABLE `events_metadata` (
+--  `SyncId` varchar(36) NOT NULL,
+--  `UserID` int(11) NOT NULL,
+--  `CreationTime` datetime NOT NULL,
+--  `ModifyTime` datetime DEFAULT NULL,
+--  `LastSyncTime` datetime DEFAULT NULL,
+--  `Status` enum('created','updated','deleted') DEFAULT 'created',
+--  PRIMARY KEY (`SyncId`),
+--  KEY `idx_user_id` (`UserID`),
+--  CONSTRAINT `fk_events_user_id` FOREIGN KEY (`UserID`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+--) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+---- ----------------------------
+---- Таблица: events_content
+---- ----------------------------
+--CREATE TABLE `events_content` (
+--  `SyncId` varchar(36) NOT NULL,
+--  `Title` varchar(255) NOT NULL,
+--  `Description` text DEFAULT NULL,
+--  `Date` date NOT NULL,
+--  `StartTime` datetime NOT NULL,
+--  `EndTime` datetime NOT NULL,
+--  `Type` varchar(50) NOT NULL,
+--  PRIMARY KEY (`SyncId`),
+--  CONSTRAINT `fk_events_content_sync_id` FOREIGN KEY (`SyncId`) REFERENCES `events_metadata` (`SyncId`) ON DELETE CASCADE ON UPDATE CASCADE
+--) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
