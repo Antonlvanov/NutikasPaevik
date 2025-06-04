@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Shell xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+       xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+       xmlns:local="clr-namespace:NutikasPaevik"
+       x:Class="NutikasPaevik.AppShell"
+       FlyoutWidth="210"
+       FlyoutBehavior="Flyout"
+       FlyoutBackgroundColor="{DynamicResource PrimaryBackgroundColor}"
+       Shell.ForegroundColor="{DynamicResource TextColor}"
+       Shell.BackgroundColor="{DynamicResource PrimaryBackgroundColor}"
+       Shell.TitleColor="{DynamicResource TextColor}"
+       Title="NutikasPaevik">
+
+    <Shell.Resources>
+        <ResourceDictionary>
+            <Style TargetType="FlyoutItem">
+                <Setter Property="Shell.ForegroundColor" Value="{DynamicResource TextColor}" />
+            </Style>
+
+            <Style x:Key="FlyoutFooterButton" TargetType="Button">
+                <Setter Property="BackgroundColor" Value="Transparent" />
+                <Setter Property="TextColor" Value="{DynamicResource ButtonTextColor}" />
+                <Setter Property="FontSize" Value="12" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="Padding" Value="0" />
+                <Setter Property="ImageSource" Value="{Binding Source={RelativeSource Self}, Path=ImageSource}" />
+                <Setter Property="VerticalOptions" Value="Center" />
+                <Setter Property="HorizontalOptions" Value="Center" />
+                <Style.Triggers>
+                    <Trigger TargetType="Button" Property="IsPressed" Value="True">
+                        <Setter Property="Opacity" Value="0.7" />
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+        </ResourceDictionary>
+    </Shell.Resources>
+
+    <Shell.ItemTemplate>
+        <DataTemplate>
+            <Grid Padding="10"
+              Margin="20,0,0,0"
+              ColumnDefinitions="Auto,*"
+              ColumnSpacing="10"
+              VerticalOptions="Center">
+                <Image Grid.Column="0"
+                   Source="{Binding Icon}"
+                   HeightRequest="24"
+                   WidthRequest="24"
+                   VerticalOptions="Center"
+                   HorizontalOptions="Start" />
+                <Label x:Name="FlyoutLabel"
+                   Grid.Column="1"
+                   Text="{Binding Title}"
+                   TextColor="{DynamicResource TextColor}"
+                   FontSize="16"
+                   VerticalOptions="Center"
+                   HorizontalOptions="Start"
+                   BackgroundColor="{DynamicResource PrimaryBackgroundColor}">
+                    <VisualStateManager.VisualStateGroups>
+                        <VisualStateGroupList>
+                            <VisualStateGroup x:Name="CommonStates">
+                                <VisualState x:Name="Normal" />
+                                <VisualState x:Name="Selected">
+                                    <VisualState.Setters>
+                                        <Setter Property="TextColor" Value="{DynamicResource AccentColor}" />
+                                    </VisualState.Setters>
+                                </VisualState>
+                            </VisualStateGroup>
+                        </VisualStateGroupList>
+                    </VisualStateManager.VisualStateGroups>
+                </Label>
+            </Grid>
+        </DataTemplate>
+    </Shell.ItemTemplate>
+
+    <Shell.FlyoutHeader>
+        <StackLayout HeightRequest="100">
+            <Image Source="logo_transparent.png"
+                   Margin="0,10,0,0"
+                   HeightRequest="80"
+                   HorizontalOptions="Center" />
+        </StackLayout>
+    </Shell.FlyoutHeader>
+
+    <FlyoutItem Title="Koduleht" Icon="{DynamicResource HomeIcon}">
+        <ShellContent Route="Koduleht" ContentTemplate="{DataTemplate local:HomePage}" />
+    </FlyoutItem>
+
+    <FlyoutItem Title="Päevik" Icon="{DynamicResource DiaryIcon}">
+        <ShellContent Route="Paevik" ContentTemplate="{DataTemplate local:DiaryPage}" />
+    </FlyoutItem>
+
+    <FlyoutItem Title="Planeeria" Icon="{DynamicResource ScheduleIcon}">
+        <ShellContent Route="Planeeria" ContentTemplate="{DataTemplate local:CalendarPage}" />
+    </FlyoutItem>
+
+    <Shell.FlyoutFooter>
+        <Frame Margin="5"
+               Padding="0"
+               BackgroundColor="{DynamicResource PrimaryBackgroundColor}">
+            <Grid ColumnDefinitions="*,*,*"
+                  HeightRequest="60"
+                  Padding="30,0"
+                  ColumnSpacing="0">
+                <Button Grid.Column="0"
+                        HorizontalOptions="Center"
+                        ImageSource="{DynamicResource AccountIcon}"
+                        Clicked="OnProfileClicked"
+                        Padding="0,0"
+                        Margin="0,0,5,0"
+                        BackgroundColor="Transparent"
+                        Style="{StaticResource FlyoutFooterButton}" />
+                <Button Grid.Column="1"
+                        ImageSource="{DynamicResource SettingsIcon}"
+                        Clicked="OnSettingsClicked"
+                        Padding="4,0"
+                        Margin="0,0,0,0"
+                        HorizontalOptions="Center"
+                        BackgroundColor="Transparent"
+                        Style="{StaticResource FlyoutFooterButton}" />
+                <Button Grid.Column="2"
+                        ImageSource="{DynamicResource LogoutIcon}"
+                        Padding="0,0"
+                        Margin="15,0,0,0"
+                        Clicked="OnLogoutClicked"
+                        HorizontalOptions="End"
+                        BackgroundColor="Transparent"
+                        Style="{StaticResource FlyoutFooterButton}" />
+            </Grid>
+        </Frame>
+    </Shell.FlyoutFooter>
+</Shell>

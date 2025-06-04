@@ -1,0 +1,104 @@
+﻿<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="NutikasPaevik.DiaryPage"
+             xmlns:local="clr-namespace:NutikasPaevik"
+             Background="{DynamicResource PrimaryBackgroundColor}"
+             Shell.TabBarBackgroundColor="{DynamicResource PrimaryBackgroundColor}"
+             Title="Päevik"
+             x:Name="page"
+             Shell.NavBarIsVisible="False">
+    <ContentPage.Resources>
+        <local:NoteColorToImageConverter x:Key="NoteColorToImageConverter" />
+        <local:NoteColorToColorConverter x:Key="NoteColorToColorConverter" />
+        <local:NoteToViewConverter x:Key="NoteToViewConverter" />
+        <local:HalfWidthConverter x:Key="HalfWidthConverter" />
+    </ContentPage.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <CarouselView x:Name="NotesCarouselView"
+                      ItemsSource="{Binding NotesByDate}"
+                      CurrentItem="{Binding NotesForSelectedDate, Mode=TwoWay}"
+                      VerticalOptions="FillAndExpand"
+                      Loop="False">
+            <CarouselView.ItemTemplate>
+                <DataTemplate>
+                    <ScrollView VerticalOptions="FillAndExpand">
+                        <StackLayout Padding="10">
+                            <Frame CornerRadius="0"
+                                   Padding="7"
+                                   Margin="0,0,0,10"
+                                   HorizontalOptions="Center"
+                                   BackgroundColor="{DynamicResource PrimaryBackgroundColor}">
+                                <Label Text="{Binding Date, StringFormat='{0:dd MMMM yyyy}'}"
+                                       FontSize="18"
+                                       FontAttributes="Bold"
+                                       TextColor="{DynamicResource TextColor}"
+                                       VerticalOptions="Center"
+                                       HorizontalOptions="Center" />
+                            </Frame>
+                            <HorizontalStackLayout Spacing="5"
+                                                  HorizontalOptions="FillAndExpand">
+                                <VerticalStackLayout x:Name="LeftColumn"
+                                                    WidthRequest="{Binding Source={x:Reference page}, Path=Width, Converter={StaticResource HalfWidthConverter}}"
+                                                    Spacing="5"
+                                                    HorizontalOptions="StartAndExpand"
+                                                    BindableLayout.ItemsSource="{Binding LeftColumnNotes}">
+                                    <BindableLayout.ItemTemplate>
+                                        <DataTemplate>
+                                            <ContentView Content="{Binding ., Converter={StaticResource NoteToViewConverter}}">
+                                                <ContentView.GestureRecognizers>
+                                                    <TapGestureRecognizer Command="{Binding Source={x:Reference page}, Path=BindingContext.OpenNoteCommand}" CommandParameter="{Binding .}" />
+                                                </ContentView.GestureRecognizers>
+                                            </ContentView>
+                                        </DataTemplate>
+                                    </BindableLayout.ItemTemplate>
+                                </VerticalStackLayout>
+                                <VerticalStackLayout x:Name="RightColumn"
+                                                    WidthRequest="{Binding Source={x:Reference page}, Path=Width, Converter={StaticResource HalfWidthConverter}}"
+                                                    Spacing="5"
+                                                    HorizontalOptions="StartAndExpand"
+                                                    BindableLayout.ItemsSource="{Binding RightColumnNotes}">
+                                    <BindableLayout.ItemTemplate>
+                                        <DataTemplate>
+                                            <ContentView Content="{Binding ., Converter={StaticResource NoteToViewConverter}}">
+                                                <ContentView.GestureRecognizers>
+                                                    <TapGestureRecognizer Command="{Binding Source={x:Reference page}, Path=BindingContext.OpenNoteCommand}" CommandParameter="{Binding .}" />
+                                                </ContentView.GestureRecognizers>
+                                            </ContentView>
+                                        </DataTemplate>
+                                    </BindableLayout.ItemTemplate>
+                                </VerticalStackLayout>
+                            </HorizontalStackLayout>
+                        </StackLayout>
+                    </ScrollView>
+                </DataTemplate>
+            </CarouselView.ItemTemplate>
+        </CarouselView>
+        <Button x:Name="AddButton"
+                ImageSource="{DynamicResource AddIcon}"
+                Command="{Binding AddNoteCommand}"
+                BackgroundColor="Transparent"
+                WidthRequest="75"
+                HeightRequest="75"
+                CornerRadius="37"
+                HorizontalOptions="End"
+                VerticalOptions="End"
+                Margin="20"
+                ZIndex="1"/>
+        <Button x:Name="BackButton"
+                ImageSource="{DynamicResource MenuIcon}"
+                BackgroundColor="Transparent"
+                MinimumWidthRequest="80"
+                MinimumHeightRequest="80"
+                WidthRequest="50"
+                HeightRequest="50"
+                Scale="1.2"
+                HorizontalOptions="Start"
+                VerticalOptions="Start"
+                Margin="5"
+                ZIndex="1"
+                Clicked="OnBackButtonClicked"/>
+    </Grid>
+</ContentPage>

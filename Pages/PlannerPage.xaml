@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="NutikasPaevik.PlannerPage"
+             xmlns:local="clr-namespace:NutikasPaevik"
+             BackgroundColor="{DynamicResource PrimaryBackgroundColor}"
+             Shell.TabBarBackgroundColor="{DynamicResource PrimaryBackgroundColor}"
+             Title="Planeeria"
+             x:Name="page"
+             Shell.NavBarIsVisible="False">
+    <ContentPage.Resources>
+        <local:EventTypeToColorConverter x:Key="EventTypeToColorConverter" />
+        <local:EventTypeToStringConverter x:Key="EventTypeToStringConverter" />
+        <local:TimeRangeConverter x:Key="TimeRangeConverter" />
+        <local:EventTypeToIconConverter x:Key="EventTypeToIconConverter" />
+    </ContentPage.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <CarouselView x:Name="EventsCarouselView"
+                      ItemsSource="{Binding EventsByDate}"
+                      CurrentItem="{Binding EventsForSelectedDate, Mode=TwoWay}"
+                      VerticalOptions="Fill"
+                      Loop="False">
+            <CarouselView.ItemTemplate>
+                <DataTemplate>
+                    <ScrollView VerticalOptions="Fill">
+                        <StackLayout Padding="10">
+                            <Frame CornerRadius="0"
+                                   Padding="7"
+                                   Margin="0,0,0,10"
+                                   HorizontalOptions="Center"
+                                   BackgroundColor="{DynamicResource PrimaryBackgroundColor}">
+                                <Label Text="{Binding Date, StringFormat='{0:dd MMMM yyyy}'}"
+                                       FontSize="18"
+                                       FontAttributes="Bold"
+                                       TextColor="{DynamicResource TextColor}"
+                                       HorizontalOptions="Center"
+                                       VerticalOptions="Center" />
+                            </Frame>
+                            <StackLayout BindableLayout.ItemsSource="{Binding Events}">
+                                <BindableLayout.ItemTemplate>
+                                    <DataTemplate>
+                                        <Frame Padding="10"
+                                               Margin="0,0,0,5"
+                                               CornerRadius="10"
+                                               BackgroundColor="{Binding Type, Converter={StaticResource EventTypeToColorConverter}}"
+                                               BorderColor="{DynamicResource BorderColor}">
+                                            <Frame.GestureRecognizers>
+                                                <TapGestureRecognizer Command="{Binding Source={x:Reference page}, Path=BindingContext.OpenEventCommand}"
+                                                                      CommandParameter="{Binding .}" />
+                                            </Frame.GestureRecognizers>
+                                            <Grid ColumnSpacing="10">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <StackLayout Grid.Column="0" Orientation="Horizontal" Spacing="10">
+                                                    <Label Text="{Binding StartTime, StringFormat='{0:HH:mm}'}"
+                                                           FontSize="14"
+                                                           TextColor="{DynamicResource TertiaryTextColor}"
+                                                           VerticalOptions="Center" />
+                                                    <BoxView WidthRequest="2"
+                                                             BackgroundColor="{DynamicResource BorderColor}"
+                                                             VerticalOptions="Fill" />
+                                                    <StackLayout Spacing="5">
+                                                        <Label Text="{Binding Title}"
+                                                               FontSize="16"
+                                                               FontAttributes="Bold"
+                                                               TextColor="{DynamicResource TertiaryTextColor}" />
+                                                        <Label FontSize="14"
+                                                               TextColor="{DynamicResource TertiaryTextColor}">
+                                                            <Label.Text>
+                                                                <MultiBinding Converter="{StaticResource TimeRangeConverter}">
+                                                                    <Binding Path="StartTime" />
+                                                                    <Binding Path="EndTime" />
+                                                                </MultiBinding>
+                                                            </Label.Text>
+                                                        </Label>
+                                                        <Label Text="{Binding Type, Converter={StaticResource EventTypeToStringConverter}}"
+                                                               FontSize="12"
+                                                               TextColor="{DynamicResource TertiaryTextColor}" />
+                                                        <Label Text="{Binding Description}"
+                                                               FontSize="12"
+                                                               TextColor="{DynamicResource TertiaryTextColor}"
+                                                               MaxLines="2"
+                                                               LineBreakMode="TailTruncation" />
+                                                    </StackLayout>
+                                                </StackLayout>
+                                                <Image Grid.Column="1"
+                                                       Source="{Binding Type, Converter={StaticResource EventTypeToIconConverter}}"
+                                                       WidthRequest="40"
+                                                       HeightRequest="40"
+                                                       Margin="0,0,5,0"
+                                                    VerticalOptions="Center"
+                                                       HorizontalOptions="End" />
+                                            </Grid>
+                                        </Frame>
+                                    </DataTemplate>
+                                </BindableLayout.ItemTemplate>
+                            </StackLayout>
+                        </StackLayout>
+                    </ScrollView>
+                </DataTemplate>
+            </CarouselView.ItemTemplate>
+        </CarouselView>
+
+        <Button ImageSource="{DynamicResource AddIcon}"
+                Command="{Binding AddEventCommand}"
+                BackgroundColor="Transparent"
+                WidthRequest="75"
+                HeightRequest="75"
+                CornerRadius="37"
+                HorizontalOptions="End"
+                VerticalOptions="End"
+                Margin="20"
+                ZIndex="1" />
+        
+        <Button ImageSource="{DynamicResource MenuIcon}"
+                BackgroundColor="Transparent"
+                MinimumWidthRequest="80"
+                MinimumHeightRequest="80"
+                WidthRequest="50"
+                HeightRequest="50"
+                Scale="1.2"
+                HorizontalOptions="Start"
+                VerticalOptions="Start"
+                Margin="5"
+                Command="{Binding OpenMenuCommand}" />
+
+        <Button ImageSource="{DynamicResource ScheduleIcon}"
+                BackgroundColor="Transparent"
+                MinimumWidthRequest="80"
+                MinimumHeightRequest="80"
+                WidthRequest="50"
+                HeightRequest="50"
+                Scale="1.2"
+                HorizontalOptions="End"
+                VerticalOptions="Start"
+                Margin="5"
+                Command="{Binding OpenCalendarCommand}" />
+    </Grid>
+</ContentPage>

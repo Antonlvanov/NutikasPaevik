@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="NutikasPaevik.SettingsPage"
+             Title="Seaded"
+             Background="{DynamicResource PrimaryBackgroundColor}"
+             xmlns:local="clr-namespace:NutikasPaevik">
+    <ContentPage.Resources>
+        <local:EnumToIntConverter x:Key="EnumToIntConverter" />
+    </ContentPage.Resources>
+    <StackLayout Padding="20" Spacing="15">
+        <Label Text="Teema"
+               FontSize="18"
+               FontAttributes="Bold"
+               TextColor="{DynamicResource ButtonTextColor}"
+               HorizontalOptions="Start" />
+        <Picker x:Name="ThemePicker"
+                Title="{Binding SelectedTheme, Source={x:Static local:AppSettings.Instance}}"
+                FontSize="16"
+                TextColor="{DynamicResource ButtonTextColor}"
+                SelectedIndex="{Binding SelectedTheme, Source={x:Static local:AppSettings.Instance}, Mode=TwoWay, Converter={StaticResource EnumToIntConverter}}">
+            <Picker.ItemsSource>
+                <x:Array Type="{x:Type x:String}">
+                    <x:String>Valgus</x:String>
+                    <x:String>Tume</x:String>
+                    <x:String>Kohandatud</x:String>
+                </x:Array>
+            </Picker.ItemsSource>
+        </Picker>
+        <Label Text="Märkmete stiil"
+               FontSize="18"
+               FontAttributes="Bold"
+               TextColor="{DynamicResource TextColor}"
+               HorizontalOptions="Start" />
+        <Picker x:Name="StylePicker"
+                Title="{Binding NoteDisplayStyle, Source={x:Static local:AppSettings.Instance}}"
+                FontSize="16"
+                TextColor="{DynamicResource TextColor}"
+                SelectedIndex="{Binding NoteDisplayStyle, Source={x:Static local:AppSettings.Instance}, Mode=TwoWay, Converter={StaticResource EnumToIntConverter}}">
+            <Picker.ItemsSource>
+                <x:Array Type="{x:Type x:String}">
+                    <x:String>Modern</x:String>
+                    <x:String>Sticker</x:String>
+                </x:Array>
+            </Picker.ItemsSource>
+        </Picker>
+        <Button Text="Sünkroniseeri märkmed (two-side)"
+                Clicked="OnSyncNotesClicked"
+                FontSize="16"
+                TextColor="{DynamicResource ButtonTextColor}"
+                BackgroundColor="{DynamicResource ButtonBackgroundColor}"
+                CornerRadius="5"
+                HorizontalOptions="FillAndExpand"
+                Margin="0,20,0,0" />
+        <Button Text="Sünkroniseeri märkmed (client > server)"
+                Clicked="OnSyncNotesClientToServerClicked"
+                FontSize="16"
+                TextColor="{DynamicResource ButtonTextColor}"
+                BackgroundColor="{DynamicResource ButtonBackgroundColor}"
+                CornerRadius="5"
+                HorizontalOptions="FillAndExpand" />
+        <Button Text="Sünkroniseeri märkmed (server > client)"
+                Clicked="OnSyncNotesServerToClientClicked"
+                FontSize="16"
+                TextColor="{DynamicResource ButtonTextColor}"
+                BackgroundColor="{DynamicResource ButtonBackgroundColor}"
+                CornerRadius="5"
+                HorizontalOptions="FillAndExpand" />
+        
+        <Button Text="Sünkroniseeri sünmused (client > server)"
+                Clicked="OnSyncEventsClientToServerClicked"
+                FontSize="16"
+                TextColor="{DynamicResource ButtonTextColor}"
+                BackgroundColor="{DynamicResource ButtonBackgroundColor}"
+                CornerRadius="5"
+                HorizontalOptions="FillAndExpand" />
+        <Button Text="Sünkroniseeri sünmused (server > client)"
+                Clicked="OnSyncEventsServerToClientClicked"
+                FontSize="16"
+                TextColor="{DynamicResource ButtonTextColor}"
+                BackgroundColor="{DynamicResource ButtonBackgroundColor}"
+                CornerRadius="5"
+                HorizontalOptions="FillAndExpand" />
+
+        <Button Text="Puhasta andmebaas"
+                Clicked="OnClearLocalDatabaseClicked"
+                FontSize="16"
+                TextColor="{DynamicResource ButtonTextColor}"
+                BackgroundColor="{DynamicResource ButtonBackgroundColor}"
+                CornerRadius="5"
+                HorizontalOptions="FillAndExpand" />
+
+        <Button Text="{Binding CurrentUser.Username, Source={x:Static local:UserService.Instance}, StringFormat='Puhasta sündmused ({0})', FallbackValue='Logi sisse'}"
+                Clicked="OnClearLocalUserEventsClicked"
+                FontSize="16"
+                TextColor="{DynamicResource ButtonTextColor}"
+                BackgroundColor="{DynamicResource ButtonBackgroundColor}"
+                CornerRadius="5"
+                HorizontalOptions="Fill" />
+        
+        <Button Text="{Binding CurrentUser.Username, Source={x:Static local:UserService.Instance}, StringFormat='Puhasta märkmed ({0})', FallbackValue='Logi sisse'}"
+                Clicked="OnClearLocalUserNotesClicked"
+                FontSize="16"
+                TextColor="{DynamicResource ButtonTextColor}"
+                BackgroundColor="{DynamicResource ButtonBackgroundColor}"
+                CornerRadius="5"
+                HorizontalOptions="FillAndExpand" />
+    </StackLayout>
+</ContentPage>

@@ -1,0 +1,207 @@
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:NutikasPaevik"
+             x:Class="NutikasPaevik.HomePage"
+             BackgroundColor="{DynamicResource PrimaryBackgroundColor}"
+             Shell.TabBarBackgroundColor="{DynamicResource PrimaryBackgroundColor}"
+             x:Name="page"
+             Shell.NavBarIsVisible="False">
+    <ContentPage.Resources>
+        <!-- Конвертеры -->
+        <local:NoteColorToColorConverter x:Key="NoteColorToColorConverter" />
+        <local:EventTypeToColorConverter x:Key="EventTypeToColorConverter" />
+        <local:EventTypeToIconConverter x:Key="EventTypeToIconConverter" />
+
+        <!-- Стиль для Border -->
+        <Style x:Key="CompactItemBorderStyle" TargetType="Border">
+            <Setter Property="StrokeThickness" Value="0" />
+            <Setter Property="MinimumHeightRequest" Value="40" />
+            <Setter Property="MaximumHeightRequest" Value="40" />
+            <Setter Property="Margin" Value="3" />
+            <Setter Property="StrokeShape" Value="{RoundRectangle CornerRadius=10}" />
+        </Style>
+
+        <!-- Стиль для Border заметок -->
+        <Style x:Key="NoteItemBorderStyle" TargetType="Border">
+            <Setter Property="StrokeThickness" Value="0" />
+            <Setter Property="HeightRequest" Value="100" />
+            <!-- Половина высоты секции (150/2 - 2*Margin) -->
+            <Setter Property="WidthRequest" Value="175" />
+            <!-- Примерная половина ширины секции, можно настроить -->
+            <Setter Property="Margin" Value="5" />
+            <Setter Property="StrokeShape" Value="{RoundRectangle CornerRadius=10}" />
+        </Style>
+
+        <!-- Стиль для заголовков разделов -->
+        <Style x:Key="SectionTitleStyle" TargetType="Label">
+            <Setter Property="FontSize" Value="15" />
+            <Setter Property="FontAttributes" Value="Bold" />
+            <Setter Property="TextColor" Value="{DynamicResource TextColor}" />
+            <Setter Property="Padding" Value="0,2,0,5" />
+            <Setter Property="HorizontalOptions" Value="Center" />
+        </Style>
+
+        <!-- Стиль для контейнеров разделов -->
+        <Style x:Key="SectionContainerStyle" TargetType="Frame">
+            <Setter Property="BackgroundColor" Value="{DynamicResource FrameBackgroundColor}" />
+            <Setter Property="BorderColor" Value="Transparent" />
+            <Setter Property="CornerRadius" Value="10" />
+            <Setter Property="Padding" Value="10" />
+            <Setter Property="Margin" Value="7,0,7,10" />
+        </Style>
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="Auto,*,*,Auto" ColumnDefinitions="*">
+        <Label Text="Kolmapäev 4. Juuni"
+               FontSize="18"
+               FontAttributes="Bold"
+               TextColor="{DynamicResource TextColor}"
+               VerticalOptions="Center"
+               HorizontalOptions="Center" />
+        <!-- Верхняя часть: мероприятия и задачи -->
+        <Grid Grid.Row="1" ColumnSpan="2" RowDefinitions="*" ColumnDefinitions="*,*">
+            <!-- Мероприятия на сегодня -->
+            <Frame Grid.Column="0" Style="{StaticResource SectionContainerStyle}">
+                <StackLayout>
+                    <Label Text="Sündmused" Style="{StaticResource SectionTitleStyle}" />
+                    <CollectionView ItemsSource="{Binding TodayEvents}" HeightRequest="300">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Border Style="{StaticResource CompactItemBorderStyle}">
+                                    <Border.BackgroundColor>
+                                        <Binding Path="Type" Converter="{StaticResource EventTypeToColorConverter}" />
+                                    </Border.BackgroundColor>
+                                    <Grid ColumnDefinitions="Auto,*,Auto" Padding="10,5">
+                                        <Image Source="{Binding Type, Converter={StaticResource EventTypeToIconConverter}}" 
+                                               WidthRequest="16" 
+                                               HeightRequest="16" 
+                                               VerticalOptions="Center" 
+                                               Margin="0,0,5,0" />
+                                        <Label Grid.Column="1" 
+                                               Text="{Binding Title}" 
+                                               FontSize="14" 
+                                               FontAttributes="Bold" 
+                                               TextColor="#333" 
+                                               LineBreakMode="TailTruncation" 
+                                               VerticalOptions="Center" />
+                                        <Label Grid.Column="2" 
+                                               Text="{Binding StartTime, StringFormat='{0:HH:mm}'}" 
+                                               FontSize="12" 
+                                               TextColor="#666" 
+                                               VerticalOptions="Center" 
+                                               Padding="5,0,0,0" />
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </StackLayout>
+            </Frame>
+            <!-- Задачи на сегодня -->
+            <Frame Grid.Column="1" Style="{StaticResource SectionContainerStyle}">
+                <StackLayout>
+                    <Label Text="Ülesanded" Style="{StaticResource SectionTitleStyle}" />
+                    <CollectionView ItemsSource="{Binding TodayTasks}" HeightRequest="300">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Border Style="{StaticResource CompactItemBorderStyle}">
+                                    <Border.BackgroundColor>
+                                        <Binding Path="Type" Converter="{StaticResource EventTypeToColorConverter}" />
+                                    </Border.BackgroundColor>
+                                    <Grid ColumnDefinitions="Auto,*,Auto" Padding="10,5">
+                                        <Image Source="{Binding Type, Converter={StaticResource EventTypeToIconConverter}}" 
+                                               WidthRequest="16" 
+                                               HeightRequest="16" 
+                                               VerticalOptions="Center" 
+                                               Margin="0,0,5,0" />
+                                        <Label Grid.Column="1" 
+                                               Text="{Binding Title}" 
+                                               FontSize="14" 
+                                               FontAttributes="Bold" 
+                                               TextColor="#333" 
+                                               LineBreakMode="TailTruncation" 
+                                               VerticalOptions="Center" />
+                                        <Label Grid.Column="2" 
+                                               Text="{Binding StartTime, StringFormat='{0:HH:mm}'}" 
+                                               FontSize="12" 
+                                               TextColor="#666" 
+                                               VerticalOptions="Center" 
+                                               Padding="5,0,0,0" />
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </StackLayout>
+            </Frame>
+        </Grid>
+
+        <!-- Заметки -->
+        <Frame Grid.Row="2" Style="{StaticResource SectionContainerStyle}">
+            <StackLayout>
+                <Label Text="Märkmed" Style="{StaticResource SectionTitleStyle}" />
+                <CollectionView ItemsSource="{Binding TodayNotes}" HeightRequest="300">
+                    <CollectionView.ItemsLayout>
+                        <GridItemsLayout Orientation="Vertical" Span="2" />
+                    </CollectionView.ItemsLayout>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Border Style="{StaticResource NoteItemBorderStyle}">
+                                <Border.BackgroundColor>
+                                    <Binding Path="NoteColor" Converter="{StaticResource NoteColorToColorConverter}" />
+                                </Border.BackgroundColor>
+                                <StackLayout Padding="10,5">
+                                    <Label Text="{Binding Title}" 
+                                           FontSize="14" 
+                                           FontAttributes="Bold" 
+                                           TextColor="#333" 
+                                           LineBreakMode="TailTruncation" 
+                                           VerticalOptions="Start" />
+                                    <Label Text="{Binding Content}" 
+                                           FontSize="12" 
+                                           TextColor="#666" 
+                                           LineBreakMode="WordWrap" 
+                                           MaxLines="2" 
+                                           VerticalOptions="Start" />
+                                    <Label Text="{Binding CreationTime, StringFormat='{0:HH:mm}'}" 
+                                           FontSize="10" 
+                                           TextColor="#666" 
+                                           VerticalOptions="End" 
+                                           HorizontalOptions="End" />
+                                </StackLayout>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </StackLayout>
+        </Frame>
+
+        <!-- Статистика -->
+        <Frame Grid.Row="3" Style="{StaticResource SectionContainerStyle}">
+            <StackLayout>
+                <Label Text="Statistika" Style="{StaticResource SectionTitleStyle}" />
+                <Label Text="{Binding StatisticsText}" TextColor="{DynamicResource TextColor}" />
+            </StackLayout>
+        </Frame>
+
+        <!-- Индикатор загрузки -->
+        <ActivityIndicator IsRunning="{Binding IsLoading}"
+                           Color="{DynamicResource TextColor}" 
+                           HorizontalOptions="Center" 
+                           VerticalOptions="Center" />
+        
+        <Button x:Name="BackButton"
+                ImageSource="{DynamicResource MenuIcon}"
+                BackgroundColor="Transparent"
+                MinimumWidthRequest="80"
+                MinimumHeightRequest="80"
+                WidthRequest="50"
+                HeightRequest="50"
+                Scale="1.2"
+                HorizontalOptions="Start"
+                VerticalOptions="Start"
+                Margin="5"
+                ZIndex="1"
+                Clicked="OnBackButtonClicked"/>
+    </Grid>
+</ContentPage>

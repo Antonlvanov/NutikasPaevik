@@ -1,0 +1,124 @@
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="NutikasPaevik.CalendarPage"
+             xmlns:local="clr-namespace:NutikasPaevik"
+             Title="Calendar"
+             BackgroundColor="{DynamicResource PrimaryBackgroundColor}"
+             Shell.NavBarIsVisible="False"
+             x:Name="calendarPage">
+    <ContentPage.Resources>
+        <local:IsDayFromCurrentMonthToColorConverter x:Key="IsDayFromCurrentMonthToColorConverter" />
+        <local:EventTypeToColorConverter x:Key="EventTypeToColorConverter" />
+        <local:CalendarHeightConverter x:Key="CalendarHeightConverter" />
+        <local:IsTodayToBorderColorConverter x:Key="IsTodayToBorderColorConverter" />
+    </ContentPage.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <CarouselView x:Name="MonthsCarouselView"
+                  ItemsSource="{Binding Months}"
+                  CurrentItem="{Binding CurrentMonth, Mode=TwoWay}"
+                  VerticalOptions="Fill"
+                  Loop="False">
+            <CarouselView.ItemTemplate>
+                <DataTemplate>
+                    <ScrollView VerticalOptions="Fill">
+                        <StackLayout Padding="10">
+                            <Frame CornerRadius="0"
+                                   Padding="7"
+                                   Margin="0,0,0,10"
+                                   HorizontalOptions="Center"
+                                   BackgroundColor="{DynamicResource PrimaryBackgroundColor}">
+                                <Label Text="{Binding MonthYear}"
+                                       FontSize="18"
+                                       FontAttributes="Bold"
+                                       TextColor="{DynamicResource TextColor}"
+                                       VerticalOptions="Center"
+                                       HorizontalOptions="Center"/>
+                            </Frame>
+                            <Grid BackgroundColor="{DynamicResource FrameBackgroundColor}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Label Text="Es" FontSize="16" TextColor="{DynamicResource TextColor}" HorizontalOptions="Center" Grid.Column="0" />
+                                <Label Text="Te" FontSize="16" TextColor="{DynamicResource TextColor}" HorizontalOptions="Center" Grid.Column="1" />
+                                <Label Text="Ko" FontSize="16" TextColor="{DynamicResource TextColor}" HorizontalOptions="Center" Grid.Column="2" />
+                                <Label Text="Ne" FontSize="16" TextColor="{DynamicResource TextColor}" HorizontalOptions="Center" Grid.Column="3" />
+                                <Label Text="Re" FontSize="16" TextColor="{DynamicResource TextColor}" HorizontalOptions="Center" Grid.Column="4" />
+                                <Label Text="La" FontSize="16" TextColor="{DynamicResource TextColor}" HorizontalOptions="Center" Grid.Column="5" />
+                                <Label Text="Pü" FontSize="16" TextColor="{DynamicResource TextColor}" HorizontalOptions="Center" Grid.Column="6" />
+                            </Grid>
+                            
+                            <CollectionView ItemsSource="{Binding CalendarDays}"
+                                        SelectionMode="Single">
+                                <CollectionView.ItemsLayout>
+                                    <GridItemsLayout Orientation="Vertical" Span="7" VerticalItemSpacing="2" HorizontalItemSpacing="2" />
+                                </CollectionView.ItemsLayout>
+                                <CollectionView.ItemTemplate>
+                                    <DataTemplate>
+                                        <Frame BackgroundColor="{DynamicResource PrimaryBackgroundColor}"
+                                               Padding="5"
+                                               Margin="2"
+                                               CornerRadius="5"
+                                               BorderColor="{Binding IsToday, Converter={StaticResource IsTodayToBorderColorConverter}}">
+                                            <Frame.GestureRecognizers>
+                                                <TapGestureRecognizer Tapped="OnDayTapped" />
+                                            </Frame.GestureRecognizers>
+                                            <VerticalStackLayout HeightRequest="{Binding Source={x:Reference calendarPage}, Path=Height, Converter={StaticResource CalendarHeightConverter}}">
+                                                <Label Text="{Binding Date.Day}"
+                                                   FontSize="16"
+                                                   TextColor="{Binding IsCurrentMonth, Converter={StaticResource IsDayFromCurrentMonthToColorConverter}}"
+                                                   HorizontalOptions="Center"
+                                                   VerticalOptions="Center" />
+                                                <VerticalStackLayout BindableLayout.ItemsSource="{Binding Events}"
+                                                                 Spacing="1">
+                                                    <BindableLayout.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <Frame BackgroundColor="{Binding Type, Converter={StaticResource EventTypeToColorConverter}}"
+                                                                   Padding="2"
+                                                                   CornerRadius="3"
+                                                                   Margin="0,0,0,0">
+                                                                <Label Text="{Binding Title}"
+                                                                   FontSize="10"
+                                                                   TextColor="{DynamicResource TextColor}"
+                                                                   LineBreakMode="TailTruncation" />
+                                                            </Frame>
+                                                        </DataTemplate>
+                                                    </BindableLayout.ItemTemplate>
+                                                </VerticalStackLayout>
+                                            </VerticalStackLayout>
+                                        </Frame>
+                                    </DataTemplate>
+                                </CollectionView.ItemTemplate>
+                            </CollectionView>
+                        </StackLayout>
+                    </ScrollView>
+                </DataTemplate>
+            </CarouselView.ItemTemplate>
+        </CarouselView>
+        <ActivityIndicator IsRunning="{Binding IsLoading}" 
+                           Color="{DynamicResource TextColor}" 
+                           HorizontalOptions="Center" 
+                           VerticalOptions="Center" />
+        <Button x:Name="MenuButton"
+        ImageSource="{DynamicResource MenuIcon}"
+        BackgroundColor="Transparent"
+        MinimumWidthRequest="80"
+        MinimumHeightRequest="80"
+        WidthRequest="50"
+        HeightRequest="50"
+        Scale="1.2"
+        HorizontalOptions="Start"
+        VerticalOptions="Start"
+        Margin="5"
+        ZIndex="1"
+        Clicked="OnMenuButtonClicked"/>
+    </Grid>
+</ContentPage>

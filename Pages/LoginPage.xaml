@@ -1,0 +1,17 @@
+﻿<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="NutikasPaevik.LoginPage"
+             BackgroundColor="{DynamicResource PrimaryBackgroundColor}"
+             Shell.FlyoutBehavior="Disabled"
+             Shell.NavBarIsVisible="False"
+             NavigationPage.HasNavigationBar="False">
+    <StackLayout Padding="20" VerticalOptions="Center" WidthRequest="300">
+        <Label Text="Tere tulemast" FontSize="18" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Start"/>
+        <Entry x:Name="EmailEntry" Placeholder="Email" Margin="0,20,0,0" />
+        <Entry x:Name="PasswordEntry" Placeholder="Parool" IsPassword="True" />
+        <Button Text="Logi sisse" Margin="0,20,0,0" Clicked="OnLoginClicked" WidthRequest="100" TextColor="{DynamicResource TextColor}" 
+             BackgroundColor="{DynamicResource ButtonBackgroundColor}"/>
+        <Button Text="Registreeri" Margin="0,10,0,0" Clicked="OnRegisterClicked" WidthRequest="100" TextColor="{DynamicResource TextColor}" 
+             BackgroundColor="{DynamicResource ButtonBackgroundColor}"/>
+    </StackLayout>
+</ContentPage>
