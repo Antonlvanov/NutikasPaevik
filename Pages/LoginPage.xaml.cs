@@ -1,12 +1,6 @@
-﻿using System;
-using System.Net.Http;
-using System.Net.Http.Headers;
+﻿using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
-using Microsoft.Maui.Controls;
-using Microsoft.Maui.Networking;
-using Microsoft.Maui.Storage;
 using NutikasPaevik.Database.Models;
 using NutikasPaevik.Services;
 
@@ -78,7 +72,8 @@ namespace NutikasPaevik
                     var loginResponse = JsonSerializer.Deserialize<LoginResponse>(responseContent, options);
 
                     await UserService.Instance.SetUserAsync(loginResponse.User, loginResponse.Token, PasswordEntry.Text);
-                    App.HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", loginResponse.Token);
+                    App.HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue
+                        ("Bearer", loginResponse.Token);
 
                     await SyncService.DownloadEventsFromServerAsync();
                     await SyncService.DownloadNotesFromServerAsync();

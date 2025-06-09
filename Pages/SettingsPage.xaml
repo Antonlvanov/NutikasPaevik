@@ -18,7 +18,8 @@
                 Title="{Binding SelectedTheme, Source={x:Static local:AppSettings.Instance}}"
                 FontSize="16"
                 TextColor="{DynamicResource ButtonTextColor}"
-                SelectedIndex="{Binding SelectedTheme, Source={x:Static local:AppSettings.Instance}, Mode=TwoWay, Converter={StaticResource EnumToIntConverter}}">
+                SelectedIndex="{Binding SelectedTheme, Source={x:Static local:AppSettings.Instance},
+            Mode=TwoWay, Converter={StaticResource EnumToIntConverter}}">
             <Picker.ItemsSource>
                 <x:Array Type="{x:Type x:String}">
                     <x:String>Valgus</x:String>
@@ -36,7 +37,8 @@
                 Title="{Binding NoteDisplayStyle, Source={x:Static local:AppSettings.Instance}}"
                 FontSize="16"
                 TextColor="{DynamicResource TextColor}"
-                SelectedIndex="{Binding NoteDisplayStyle, Source={x:Static local:AppSettings.Instance}, Mode=TwoWay, Converter={StaticResource EnumToIntConverter}}">
+                SelectedIndex="{Binding NoteDisplayStyle, Source={x:Static local:AppSettings.Instance},
+            Mode=TwoWay, Converter={StaticResource EnumToIntConverter}}">
             <Picker.ItemsSource>
                 <x:Array Type="{x:Type x:String}">
                     <x:String>Modern</x:String>
@@ -44,66 +46,5 @@
                 </x:Array>
             </Picker.ItemsSource>
         </Picker>
-        <Button Text="Sünkroniseeri märkmed (two-side)"
-                Clicked="OnSyncNotesClicked"
-                FontSize="16"
-                TextColor="{DynamicResource ButtonTextColor}"
-                BackgroundColor="{DynamicResource ButtonBackgroundColor}"
-                CornerRadius="5"
-                HorizontalOptions="FillAndExpand"
-                Margin="0,20,0,0" />
-        <Button Text="Sünkroniseeri märkmed (client > server)"
-                Clicked="OnSyncNotesClientToServerClicked"
-                FontSize="16"
-                TextColor="{DynamicResource ButtonTextColor}"
-                BackgroundColor="{DynamicResource ButtonBackgroundColor}"
-                CornerRadius="5"
-                HorizontalOptions="FillAndExpand" />
-        <Button Text="Sünkroniseeri märkmed (server > client)"
-                Clicked="OnSyncNotesServerToClientClicked"
-                FontSize="16"
-                TextColor="{DynamicResource ButtonTextColor}"
-                BackgroundColor="{DynamicResource ButtonBackgroundColor}"
-                CornerRadius="5"
-                HorizontalOptions="FillAndExpand" />
-        
-        <Button Text="Sünkroniseeri sünmused (client > server)"
-                Clicked="OnSyncEventsClientToServerClicked"
-                FontSize="16"
-                TextColor="{DynamicResource ButtonTextColor}"
-                BackgroundColor="{DynamicResource ButtonBackgroundColor}"
-                CornerRadius="5"
-                HorizontalOptions="FillAndExpand" />
-        <Button Text="Sünkroniseeri sünmused (server > client)"
-                Clicked="OnSyncEventsServerToClientClicked"
-                FontSize="16"
-                TextColor="{DynamicResource ButtonTextColor}"
-                BackgroundColor="{DynamicResource ButtonBackgroundColor}"
-                CornerRadius="5"
-                HorizontalOptions="FillAndExpand" />
-
-        <Button Text="Puhasta andmebaas"
-                Clicked="OnClearLocalDatabaseClicked"
-                FontSize="16"
-                TextColor="{DynamicResource ButtonTextColor}"
-                BackgroundColor="{DynamicResource ButtonBackgroundColor}"
-                CornerRadius="5"
-                HorizontalOptions="FillAndExpand" />
-
-        <Button Text="{Binding CurrentUser.Username, Source={x:Static local:UserService.Instance}, StringFormat='Puhasta sündmused ({0})', FallbackValue='Logi sisse'}"
-                Clicked="OnClearLocalUserEventsClicked"
-                FontSize="16"
-                TextColor="{DynamicResource ButtonTextColor}"
-                BackgroundColor="{DynamicResource ButtonBackgroundColor}"
-                CornerRadius="5"
-                HorizontalOptions="Fill" />
-        
-        <Button Text="{Binding CurrentUser.Username, Source={x:Static local:UserService.Instance}, StringFormat='Puhasta märkmed ({0})', FallbackValue='Logi sisse'}"
-                Clicked="OnClearLocalUserNotesClicked"
-                FontSize="16"
-                TextColor="{DynamicResource ButtonTextColor}"
-                BackgroundColor="{DynamicResource ButtonBackgroundColor}"
-                CornerRadius="5"
-                HorizontalOptions="FillAndExpand" />
     </StackLayout>
 </ContentPage>

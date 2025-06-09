@@ -18,7 +18,11 @@ namespace NutikasPaevik
         public DateTime? LastSyncTime { get; private set; }
 
         private UserService() { }
-
+        public class UpdateUserResponse
+        {
+            public User User { get; set; }
+            public string Token { get; set; }
+        }
         public async Task<bool> IsTokenValidAsync()
         {
             if (string.IsNullOrEmpty(AuthToken)) return false;
@@ -56,34 +60,6 @@ namespace NutikasPaevik
             }
         }
 
-        private async Task TryLoadUserAsync()
-        {
-            try
-            {
-                var userJson = Preferences.Get("current_user", null);
-                if (!string.IsNullOrEmpty(userJson))
-                {
-                    CurrentUser = JsonSerializer.Deserialize<User>(userJson);
-                    System.Diagnostics.Debug.WriteLine("User loaded from Preferences.");
-                }
-
-                AuthToken = await SecureStorage.GetAsync("auth_token");
-                System.Diagnostics.Debug.WriteLine("Token loaded from SecureStorage.");
-
-                var lastSyncTimeStr = Preferences.Get($"last_sync_time_{UserId}", null);
-                if (!string.IsNullOrEmpty(lastSyncTimeStr) && DateTime.TryParse(lastSyncTimeStr, out var lastSyncTime))
-                {
-                    LastSyncTime = lastSyncTime;
-                    System.Diagnostics.Debug.WriteLine($"LastSyncTime loaded: {lastSyncTime}");
-                }
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"TryLoadUserAsync error: {ex.Message}");
-                await ClearUserAsync();
-            }
-        }
-
         public async Task AutoLogin()
         {
             try
@@ -110,13 +86,6 @@ namespace NutikasPaevik
                     System.Diagnostics.Debug.WriteLine("AutoLogin failed: No internet connection.");
                     return;
                 }
-
-                //var lastSyncTimeStr = Preferences.Get($"last_sync_time_{UserId}", null);
-                //if (!string.IsNullOrEmpty(lastSyncTimeStr) && DateTime.TryParse(lastSyncTimeStr, out var lastSyncTime))
-                //{
-                //    LastSyncTime = lastSyncTime;
-                //    System.Diagnostics.Debug.WriteLine($"LastSyncTime loaded: {lastSyncTime}");
-                //}
 
                 var model = new
                 {
@@ -149,7 +118,7 @@ namespace NutikasPaevik
             }
         }
 
-        public async Task<bool> UpdateUserDetailsAsync(string newUsername, string newEmail)
+        public async Task<bool> UpdateUserDetailsAsync(string newUsername, string newEmail, string newPassword = null)
         {
             if (!IsUserLoggedIn() || CurrentUser == null)
             {
@@ -157,63 +126,42 @@ namespace NutikasPaevik
                 return false;
             }
 
-            if (CurrentUser.Username == newUsername && CurrentUser.Email == newEmail)
-            {
-                System.Diagnostics.Debug.WriteLine("UpdateUserDetailsAsync: No changes detected.");
-                return true;
-            }
-
             try
             {
                 App.HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", AuthToken);
 
-                var updateData = new
-                {
-                    username = newUsername,
-                    email = newEmail
-                };
+                var updateData = new Dictionary<string, string>();
+                if (!string.IsNullOrEmpty(newUsername)) updateData["username"] = newUsername;
+                if (!string.IsNullOrEmpty(newEmail)) updateData["email"] = newEmail;
+                if (!string.IsNullOrEmpty(newPassword)) updateData["password"] = newPassword;
 
-                // var response = await App.HttpClient.PutAsJsonAsync($"http://paevik.antonivanov23.thkit.ee/users/{CurrentUser.Id}", updateData);
                 var response = await App.HttpClient.PutAsJsonAsync("http://paevik.antonivanov23.thkit.ee/user", updateData);
 
                 if (response.IsSuccessStatusCode)
                 {
-                    System.Diagnostics.Debug.WriteLine("Server user details updated successfully.");
-
-                    User? updatedUserFromServer = null;
-                    try
+                    var responseData = await response.Content.ReadFromJsonAsync<UpdateUserResponse>();
+                    if (responseData?.User != null)
                     {
-                        updatedUserFromServer = await response.Content.ReadFromJsonAsync<User>();
-                    }
-                    catch (JsonException jsonEx)
-                    {
-                        System.Diagnostics.Debug.WriteLine($"Error deserializing updated user from server: {jsonEx.Message}. Using local data for update.");
-                    }
+                        CurrentUser.Username = responseData.User.Username;
+                        CurrentUser.Email = responseData.User.Email;
+                        Preferences.Set("current_user", JsonSerializer.Serialize(CurrentUser));
+                        Preferences.Set("user_email", CurrentUser.Email);
 
-                    if (updatedUserFromServer != null)
-                    {
-                        CurrentUser.Username = updatedUserFromServer.Username;
-                        CurrentUser.Email = updatedUserFromServer.Email;
-                    }
-                    else
-                    {
-                        CurrentUser.Username = newUsername;
-                        CurrentUser.Email = newEmail;
-                    }
+                        if (!string.IsNullOrEmpty(responseData.Token))
+                        {
+                            AuthToken = responseData.Token;
+                            await SecureStorage.SetAsync("auth_token", AuthToken);
+                            App.HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", AuthToken);
+                        }
 
-                    // idk
-                    Preferences.Set("current_user", JsonSerializer.Serialize(CurrentUser));
-                    Preferences.Set("user_email", CurrentUser.Email);
-
-                    System.Diagnostics.Debug.WriteLine($"Local user updated: ID={CurrentUser.Id}, Username={CurrentUser.Username}, Email={CurrentUser.Email}");
-                    return true;
+                        System.Diagnostics.Debug.WriteLine($"User updated: ID={CurrentUser.Id}, Username={CurrentUser.Username}, Email={CurrentUser.Email}");
+                        return true;
+                    }
                 }
-                else
-                {
-                    var errorContent = await response.Content.ReadAsStringAsync();
-                    System.Diagnostics.Debug.WriteLine($"Failed to update user details. Status: {response.StatusCode}, Content: {errorContent}");
-                    return false;
-                }
+
+                var errorContent = await response.Content.ReadAsStringAsync();
+                System.Diagnostics.Debug.WriteLine($"Failed to update user. Status: {response.StatusCode}, Content: {errorContent}");
+                return false;
             }
             catch (Exception ex)
             {

@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 using NutikasPaevik.Database;
 using NutikasPaevik.Enums;
-using NutikasPaevik.Services;
-
 namespace NutikasPaevik
 {
     public class HomePageViewModel : INotifyPropertyChanged
@@ -134,7 +128,8 @@ namespace NutikasPaevik
                         .ToList()
                 );
 
-                System.Diagnostics.Debug.WriteLine($"LoadDataAsync: Loaded {TodayNotes.Count} notes, {TodayTasks.Count} tasks, {TodayEvents.Count} events");
+                System.Diagnostics.Debug.WriteLine($"LoadDataAsync: Loaded {TodayNotes.Count} notes, " +
+                    $"{TodayTasks.Count} tasks, {TodayEvents.Count} events");
 
                 // stats
                 var totalNotes = dbContext.Notes.Count(n => n.UserID == userId);

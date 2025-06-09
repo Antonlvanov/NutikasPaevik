@@ -33,7 +33,7 @@ namespace NutikasPaevik
         {
             base.OnAppearing();
             await _viewModel.RefreshNotes();
-            MainThread.BeginInvokeOnMainThread(() =>
+            MainThread.BeginInvokeOnMainThread(() => // trying to fix scrolling bug
             {
                 if (_viewModel.NotesForSelectedDate != null)
                 {
@@ -41,7 +41,8 @@ namespace NutikasPaevik
                     if (index >= 0 && NotesCarouselView != null)
                     {
                         NotesCarouselView.ScrollTo(index, animate: false);
-                        Debug.WriteLine($"CarouselView синхронизирован с индексом {index} для даты {_viewModel.NotesForSelectedDate.Date:dd MMMM yyyy}");
+                        Debug.WriteLine($"CarouselView scrolled to index:{index} for date " +
+                            $"{_viewModel.NotesForSelectedDate.Date:dd MMMM yyyy}");
                     }
                 }
             });
@@ -53,3 +54,9 @@ namespace NutikasPaevik
         }
     }
 }
+
+
+
+
+
+

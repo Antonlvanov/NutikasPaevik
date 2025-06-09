@@ -15,12 +15,7 @@ namespace NutikasPaevik
             {
                 InitializeComponent();
                 _viewModel = new PlannerViewModel(App.Services.GetRequiredService<IServiceScopeFactory>(), selectedDate);
-                if (_viewModel == null)
-                {
-                    throw new InvalidOperationException("Failed to get PlannerViewModel from services.");
-                }
                 BindingContext = _viewModel;
-                Debug.WriteLine("PlannerPage: Initialization complete.");
             }
             catch (Exception ex)
             {
@@ -46,11 +41,10 @@ namespace NutikasPaevik
                     if (index >= 0 && EventsCarouselView != null)
                     {
                         EventsCarouselView.ScrollTo(index, animate: false);
-                        Debug.WriteLine($"CarouselView синхронизирован с индексом {index} для даты {_viewModel.EventsForSelectedDate.Date:dd MMMM yyyy}");
                     }
                     else
                     {
-                        Debug.WriteLine("PlannerPage: Could not synchronize CarouselView - invalid index or CarouselView is null.");
+                        Debug.WriteLine("PlannerPage: invalid index or CarouselView is null.");
                     }
                 }
                 else

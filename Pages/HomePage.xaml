@@ -7,12 +7,10 @@
              x:Name="page"
              Shell.NavBarIsVisible="False">
     <ContentPage.Resources>
-        <!-- Конвертеры -->
         <local:NoteColorToColorConverter x:Key="NoteColorToColorConverter" />
         <local:EventTypeToColorConverter x:Key="EventTypeToColorConverter" />
         <local:EventTypeToIconConverter x:Key="EventTypeToIconConverter" />
 
-        <!-- Стиль для Border -->
         <Style x:Key="CompactItemBorderStyle" TargetType="Border">
             <Setter Property="StrokeThickness" Value="0" />
             <Setter Property="MinimumHeightRequest" Value="40" />
@@ -21,18 +19,14 @@
             <Setter Property="StrokeShape" Value="{RoundRectangle CornerRadius=10}" />
         </Style>
 
-        <!-- Стиль для Border заметок -->
         <Style x:Key="NoteItemBorderStyle" TargetType="Border">
             <Setter Property="StrokeThickness" Value="0" />
             <Setter Property="HeightRequest" Value="100" />
-            <!-- Половина высоты секции (150/2 - 2*Margin) -->
             <Setter Property="WidthRequest" Value="175" />
-            <!-- Примерная половина ширины секции, можно настроить -->
             <Setter Property="Margin" Value="5" />
             <Setter Property="StrokeShape" Value="{RoundRectangle CornerRadius=10}" />
         </Style>
 
-        <!-- Стиль для заголовков разделов -->
         <Style x:Key="SectionTitleStyle" TargetType="Label">
             <Setter Property="FontSize" Value="15" />
             <Setter Property="FontAttributes" Value="Bold" />
@@ -41,7 +35,6 @@
             <Setter Property="HorizontalOptions" Value="Center" />
         </Style>
 
-        <!-- Стиль для контейнеров разделов -->
         <Style x:Key="SectionContainerStyle" TargetType="Frame">
             <Setter Property="BackgroundColor" Value="{DynamicResource FrameBackgroundColor}" />
             <Setter Property="BorderColor" Value="Transparent" />
@@ -52,15 +45,13 @@
     </ContentPage.Resources>
 
     <Grid RowDefinitions="Auto,*,*,Auto" ColumnDefinitions="*">
-        <Label Text="Kolmapäev 4. Juuni"
+        <Label Text="Esmaspäev 9. Juuni"
                FontSize="18"
                FontAttributes="Bold"
                TextColor="{DynamicResource TextColor}"
                VerticalOptions="Center"
                HorizontalOptions="Center" />
-        <!-- Верхняя часть: мероприятия и задачи -->
         <Grid Grid.Row="1" ColumnSpan="2" RowDefinitions="*" ColumnDefinitions="*,*">
-            <!-- Мероприятия на сегодня -->
             <Frame Grid.Column="0" Style="{StaticResource SectionContainerStyle}">
                 <StackLayout>
                     <Label Text="Sündmused" Style="{StaticResource SectionTitleStyle}" />
@@ -97,7 +88,7 @@
                     </CollectionView>
                 </StackLayout>
             </Frame>
-            <!-- Задачи на сегодня -->
+            
             <Frame Grid.Column="1" Style="{StaticResource SectionContainerStyle}">
                 <StackLayout>
                     <Label Text="Ülesanded" Style="{StaticResource SectionTitleStyle}" />
@@ -136,7 +127,6 @@
             </Frame>
         </Grid>
 
-        <!-- Заметки -->
         <Frame Grid.Row="2" Style="{StaticResource SectionContainerStyle}">
             <StackLayout>
                 <Label Text="Märkmed" Style="{StaticResource SectionTitleStyle}" />
@@ -176,7 +166,6 @@
             </StackLayout>
         </Frame>
 
-        <!-- Статистика -->
         <Frame Grid.Row="3" Style="{StaticResource SectionContainerStyle}">
             <StackLayout>
                 <Label Text="Statistika" Style="{StaticResource SectionTitleStyle}" />
@@ -184,7 +173,6 @@
             </StackLayout>
         </Frame>
 
-        <!-- Индикатор загрузки -->
         <ActivityIndicator IsRunning="{Binding IsLoading}"
                            Color="{DynamicResource TextColor}" 
                            HorizontalOptions="Center" 

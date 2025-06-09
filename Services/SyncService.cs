@@ -1,17 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Net.Http;
+﻿using System.Globalization;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Maui.Storage;
 using NutikasPaevik.Database;
-using NutikasPaevik.Services;
 
 namespace NutikasPaevik.Services
 {
@@ -19,43 +12,25 @@ namespace NutikasPaevik.Services
     {
         private static readonly HttpClient _httpClient = App.HttpClient;
 
-        public static async Task SynchronizeNotesAsync()
-        {
-            var dbContext = App.Services.GetService<AppDbContext>();
-            if (dbContext == null) throw new InvalidOperationException("AppDbContext is not available.");
-
-            try
-            {
-                await UploadNotesToServerAsync();
-                await DownloadNotesFromServerAsync();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Ошибка синхронизации заметок: {ex.Message}");
-                throw new Exception("Ошибка синхронизации заметок", ex);
-            }
-        }
-
         public static async Task UploadEventsToServerAsync()
         {
             var dbContext = App.Services.GetService<AppDbContext>();
-            if (dbContext == null) throw new InvalidOperationException("AppDbContext is not available.");
 
             try
             {
                 var localEvents = await dbContext.Events.Where(e => e.UserID == UserService.Instance.UserId).ToListAsync();
                 if (!localEvents.Any())
                 {
-                    Console.WriteLine("Нет локальных событий для синхронизации.");
+                    Console.WriteLine("No local events to sync");
                     return;
                 }
                 if (string.IsNullOrEmpty(UserService.Instance.AuthToken))
                 {
-                    Console.WriteLine("Ошибка: Токен аутентификации не найден.");
-                    throw new InvalidOperationException("Токен аутентификации не найден");
+                    Console.WriteLine("Auth token missing");
+                    throw new InvalidOperationException("No auth token");
                 }
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", UserService.Instance.AuthToken);
-                Console.WriteLine("Токен авторизации установлен.");
+                Console.WriteLine("Auth token set");
 
                 var eventsToSend = localEvents.Select(ev => new
                 {
@@ -71,69 +46,42 @@ namespace NutikasPaevik.Services
                 }).ToList();
 
                 var json = JsonSerializer.Serialize(eventsToSend);
-                Console.WriteLine($"JSON для отправки: {json}");
+                Console.WriteLine("Events JSON prepared");
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                Console.WriteLine("Отправка POST-запроса на http://paevik.antonivanov23.thkit.ee/events/sync...");
+                Console.WriteLine("Sending events to server");
                 var response = await _httpClient.PostAsync("http://paevik.antonivanov23.thkit.ee/events/sync", content);
-                Console.WriteLine($"Статус ответа сервера: {response.StatusCode}");
+                Console.WriteLine($"Server response: {response.StatusCode}");
                 response.EnsureSuccessStatusCode();
-                Console.WriteLine("Синхронизация событий client -> server завершена успешно.");
+                Console.WriteLine("Events uploaded successfully");
 
-
-                App.CalendarViewModel.MarkForRefresh(); ////
-                App.HomePageViewModel.MarkForRefresh(); ////
+                App.CalendarViewModel.MarkForRefresh();
+                App.HomePageViewModel.MarkForRefresh();
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Ошибка в UploadEventsToServerAsync: {ex.Message}");
-                if (ex.InnerException != null)
-                    Console.WriteLine($"Внутренняя ошибка: {ex.InnerException.Message}");
-                throw new Exception("Ошибка синхронизации событий client -> server", ex);
+                Console.WriteLine($"Event upload failed: {ex.Message}");
+                throw new Exception("Event upload error", ex);
             }
         }
 
         public static async Task DownloadEventsFromServerAsync()
         {
             var dbContext = App.Services.GetService<AppDbContext>();
-            if (dbContext == null)
-            {
-                Console.WriteLine("Ошибка: AppDbContext недоступен.");
-                throw new InvalidOperationException("AppDbContext is not available.");
-            }
-
             try
             {
-                Console.WriteLine("Начало синхронизации server -> client для событий...");
                 var userId = UserService.Instance.UserId;
-                if (userId == 0)
-                {
-                    Console.WriteLine("Ошибка: ID пользователя не найден.");
-                    throw new InvalidOperationException("ID пользователя не найден.");
-                }
-
                 var token = UserService.Instance.AuthToken;
-                if (string.IsNullOrEmpty(token))
-                {
-                    Console.WriteLine("Ошибка: Токен аутентификации не найден.");
-                    throw new InvalidOperationException("Токен аутентификации не найден");
-                }
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-                Console.WriteLine("Токен авторизации установлен.");
 
                 var url = "http://paevik.antonivanov23.thkit.ee/events";
-                Console.WriteLine($"Отправка GET-запроса на {url}...");
                 var response = await _httpClient.GetAsync(url);
-                Console.WriteLine($"Статус ответа сервера: {response.StatusCode}");
+                Console.WriteLine($"Server response: {response.StatusCode}");
                 response.EnsureSuccessStatusCode();
 
                 var content = await response.Content.ReadAsStringAsync();
-                Console.WriteLine($"Сырой ответ сервера: {content}");
-
-                // Парсим JSON и исправляем формат даты
                 var jsonArray = JsonSerializer.Deserialize<JsonElement>(content);
                 var modifiedEvents = new List<JsonElement>();
-
                 foreach (var evt in jsonArray.EnumerateArray())
                 {
                     var evtObject = evt.GetRawText();
@@ -153,19 +101,19 @@ namespace NutikasPaevik.Services
                 }
 
                 var modifiedContent = JsonSerializer.Serialize(modifiedEvents);
-                Console.WriteLine($"Исправленный JSON: {modifiedContent}");
+                Console.WriteLine("Fixed event JSON");
 
                 var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
                 options.Converters.Add(new CustomDateTimeConverter());
                 options.Converters.Add(new CustomNullableDateTimeConverter());
                 options.Converters.Add(new JsonStringEnumConverter());
                 var serverEvents = JsonSerializer.Deserialize<List<Event>>(modifiedContent, options);
-                Console.WriteLine($"Десериализовано событий: {serverEvents?.Count ?? 0}");
+                Console.WriteLine($"Deserialized {serverEvents?.Count ?? 0} events");
 
                 if (serverEvents == null) serverEvents = new List<Event>();
 
                 var localEvents = await dbContext.Events.Where(e => e.UserID == userId).ToListAsync();
-                Console.WriteLine($"Локальных событий: {localEvents.Count}");
+                Console.WriteLine($"Found {localEvents.Count} local events");
 
                 foreach (var serverEvent in serverEvents)
                 {
@@ -175,12 +123,12 @@ namespace NutikasPaevik.Services
                     {
                         if (serverEvent.Status == "deleted")
                         {
-                            Console.WriteLine($"Удаление локального события с SyncId={serverEvent.SyncId}");
+                            Console.WriteLine($"Deleting local event {serverEvent.SyncId}");
                             dbContext.Events.Remove(localEvent);
                         }
                         else
                         {
-                            Console.WriteLine($"Обновление локального события с SyncId={serverEvent.SyncId}");
+                            Console.WriteLine($"Updating local event {serverEvent.SyncId}");
                             localEvent.Title = serverEvent.Title;
                             localEvent.Description = serverEvent.Description;
                             localEvent.Date = serverEvent.Date;
@@ -196,7 +144,7 @@ namespace NutikasPaevik.Services
                     }
                     else if (serverEvent.Status != "deleted")
                     {
-                        Console.WriteLine($"Добавление нового события с SyncId={serverEvent.SyncId}");
+                        Console.WriteLine($"Adding new event {serverEvent.SyncId}");
                         dbContext.Events.Add(serverEvent);
                     }
                 }
@@ -205,60 +153,42 @@ namespace NutikasPaevik.Services
                 var eventsToRemove = localEvents.Where(e => !serverSyncIds.Contains(e.SyncId)).ToList();
                 if (eventsToRemove.Any())
                 {
-                    Console.WriteLine($"Удаление {eventsToRemove.Count} локальных событий, отсутствующих на сервере.");
+                    Console.WriteLine($"Removing {eventsToRemove.Count} outdated local events");
                     dbContext.Events.RemoveRange(eventsToRemove);
                 }
-
                 await dbContext.SaveChangesAsync();
+
                 UserService.Instance.UpdateLastSyncTime(DateTime.Now);
-                Console.WriteLine("Синхронизация событий server -> client завершена успешно.");
+                Console.WriteLine("Events synced successfully");
 
                 App.CalendarViewModel.MarkForRefresh();
                 App.HomePageViewModel.MarkForRefresh();
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Ошибка в DownloadEventsFromServerAsync: {ex.Message}");
-                throw new Exception("Ошибка синхронизации событий server -> client", ex);
+                Console.WriteLine($"Event download failed: {ex.Message}");
+                throw new Exception("Event download error", ex);
             }
-        }
-
-        public static async Task DeleteEventAsync(string syncId)
-        {
-            var token = UserService.Instance.AuthToken;
-            if (string.IsNullOrEmpty(token)) throw new InvalidOperationException("Токен аутентификации не найден.");
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
-            Console.WriteLine($"Отправка DELETE-запроса для SyncId={syncId}...");
-            var response = await _httpClient.DeleteAsync($"http://paevik.antonivanov23.thkit.ee/events/{syncId}");
-            Console.WriteLine($"Статус ответа сервера: {response.StatusCode}");
-            response.EnsureSuccessStatusCode();
-            Console.WriteLine("Событие успешно удалено с сервера.");
-
-            App.HomePageViewModel.MarkForRefresh(); ////
-            App.CalendarViewModel.MarkForRefresh(); ////
         }
 
         public static async Task UploadNotesToServerAsync()
         {
             var dbContext = App.Services.GetService<AppDbContext>();
-            if (dbContext == null) throw new InvalidOperationException("AppDbContext is not available.");
-
             try
             {
                 var localNotes = await dbContext.Notes.Where(n => n.UserID == UserService.Instance.UserId).ToListAsync();
                 if (!localNotes.Any())
                 {
-                    Console.WriteLine("Нет локальных заметок для синхронизации.");
+                    Console.WriteLine("No local notes to sync");
                     return;
                 }
                 if (string.IsNullOrEmpty(UserService.Instance.AuthToken))
                 {
-                    Console.WriteLine("Ошибка: Токен аутентификации не найден.");
-                    throw new InvalidOperationException("Токен аутентификации не найден");
+                    Console.WriteLine("Auth token missing");
+                    throw new InvalidOperationException("No auth token");
                 }
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", UserService.Instance.AuthToken);
-                Console.WriteLine("Токен авторизации установлен.");
+                Console.WriteLine("Auth token set");
 
                 var notesToSend = localNotes.Select(note => new
                 {
@@ -272,92 +202,66 @@ namespace NutikasPaevik.Services
                 }).ToList();
 
                 var json = JsonSerializer.Serialize(notesToSend);
-                Console.WriteLine($"JSON для отправки: {json}");
+                Console.WriteLine("Notes JSON prepared");
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                Console.WriteLine("Отправка POST-запроса на http://paevik.antonivanov23.thkit.ee/notes/sync...");
+                Console.WriteLine("Sending notes to server");
                 var response = await _httpClient.PostAsync("http://paevik.antonivanov23.thkit.ee/notes/sync", content);
-                Console.WriteLine($"Статус ответа сервера: {response.StatusCode}");
+                Console.WriteLine($"Server response: {response.StatusCode}");
                 response.EnsureSuccessStatusCode();
-                Console.WriteLine("Синхронизация заметок client -> server завершена успешно.");
+                Console.WriteLine("Notes uploaded successfully");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Ошибка в UploadNotesToServerAsync: {ex.Message}");
-                if (ex.InnerException != null)
-                    Console.WriteLine($"Внутренняя ошибка: {ex.InnerException.Message}");
-                throw new Exception("Ошибка синхронизации заметок client -> server", ex);
+                Console.WriteLine($"Note upload failed: {ex.Message}");
+                throw new Exception("Note upload error", ex);
             }
         }
 
         public static async Task DownloadNotesFromServerAsync()
         {
             var dbContext = App.Services.GetService<AppDbContext>();
-            if (dbContext == null)
-            {
-                Console.WriteLine("Ошибка: AppDbContext недоступен.");
-                throw new InvalidOperationException("AppDbContext is not available.");
-            }
-
             try
             {
-                Console.WriteLine("Начало синхронизации server -> client...");
                 var userId = UserService.Instance.UserId;
-                if (userId == 0)
-                {
-                    Console.WriteLine("Ошибка: ID пользователя не найден, загрузка заметок невозможна.");
-                    throw new InvalidOperationException("ID пользователя не найден.");
-                }
-
                 var token = UserService.Instance.AuthToken;
-                if (string.IsNullOrEmpty(token))
-                {
-                    Console.WriteLine("Ошибка: Токен аутентификации не найден.");
-                    throw new InvalidOperationException("Токен аутентификации не найден");
-                }
-                Console.WriteLine("Токен авторизации найден.");
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-                Console.WriteLine("Заголовок Authorization установлен.");
 
-                var url = "http://paevik.antonivanov23.thkit.ee/notes";
-                Console.WriteLine($"Отправка GET-запроса на {url}...");
-                var response = await _httpClient.GetAsync(url);
-                Console.WriteLine($"Статус ответа сервера: {response.StatusCode}");
+                var response = await _httpClient.GetAsync("http://paevik.antonivanov23.thkit.ee/notes");
+                Console.WriteLine($"Server response: {response.StatusCode}");
                 response.EnsureSuccessStatusCode();
 
                 var content = await response.Content.ReadAsStringAsync();
-                Console.WriteLine($"Сырой ответ сервера: {content}");
 
-                Console.WriteLine("Начало десериализации ответа...");
+                Console.WriteLine("Deserializing notes");
                 var options = new JsonSerializerOptions
                 {
                     PropertyNameCaseInsensitive = true
                 };
                 options.Converters.Add(new CustomDateTimeConverter());
                 options.Converters.Add(new CustomNullableDateTimeConverter());
-                Console.WriteLine("JsonSerializerOptions настроены с CustomDateTimeConverter и CustomNullableDateTimeConverter.");
+                Console.WriteLine("JSON options configured");
 
                 List<Note> serverNotes;
                 try
                 {
                     serverNotes = JsonSerializer.Deserialize<List<Note>>(content, options);
-                    Console.WriteLine($"Десериализовано заметок: {serverNotes?.Count ?? 0}");
+                    Console.WriteLine($"Deserialized {serverNotes?.Count ?? 0} notes");
                 }
                 catch (JsonException jsonEx)
                 {
-                    Console.WriteLine($"Ошибка десериализации JSON: {jsonEx.Message}");
-                    Console.WriteLine($"Стек вызовов: {jsonEx.StackTrace}");
+                    Console.WriteLine($"JSON deserialization failed: {jsonEx.Message}");
                     throw;
                 }
 
                 if (serverNotes == null)
                 {
-                    Console.WriteLine("Ошибка: сервер вернул null или пустой список заметок.");
+                    Console.WriteLine("No notes from server");
                     serverNotes = new List<Note>();
                 }
 
                 var localNotes = await dbContext.Notes.Where(n => n.UserID == userId).ToListAsync();
-                Console.WriteLine($"Локальных заметок: {localNotes.Count}");
+                Console.WriteLine($"Found {localNotes.Count} local notes");
 
                 foreach (var serverNote in serverNotes)
                 {
@@ -367,12 +271,12 @@ namespace NutikasPaevik.Services
                     {
                         if (serverNote.Status == "deleted")
                         {
-                            Console.WriteLine($"Удаление локальной заметки с SyncId={serverNote.SyncId}");
+                            Console.WriteLine($"Deleting local note {serverNote.SyncId}");
                             dbContext.Notes.Remove(localNote);
                         }
                         else
                         {
-                            Console.WriteLine($"Обновление локальной заметки с SyncId={serverNote.SyncId}");
+                            Console.WriteLine($"Updating local note {serverNote.SyncId}");
                             localNote.Title = serverNote.Title;
                             localNote.Content = serverNote.Content;
                             localNote.NoteColor = serverNote.NoteColor;
@@ -386,7 +290,7 @@ namespace NutikasPaevik.Services
                     }
                     else if (serverNote.Status != "deleted")
                     {
-                        Console.WriteLine($"Добавление новой заметки с SyncId={serverNote.SyncId}");
+                        Console.WriteLine($"Adding new note {serverNote.SyncId}");
                         dbContext.Notes.Add(serverNote);
                     }
                 }
@@ -395,7 +299,7 @@ namespace NutikasPaevik.Services
                 var notesToRemove = localNotes.Where(n => !serverSyncIds.Contains(n.SyncId)).ToList();
                 if (notesToRemove.Any())
                 {
-                    Console.WriteLine($"Удаление {notesToRemove.Count} локальных заметок, отсутствующих на сервере.");
+                    Console.WriteLine($"Removing {notesToRemove.Count} outdated local notes");
                     dbContext.Notes.RemoveRange(notesToRemove);
                 }
 
@@ -403,29 +307,41 @@ namespace NutikasPaevik.Services
                 UserService.Instance.UpdateLastSyncTime(DateTime.Now);
                 App.DiaryViewModel.MarkForRefresh();
                 App.HomePageViewModel.MarkForRefresh();
-                Console.WriteLine("Синхронизация заметок server -> client завершена успешно.");
+                Console.WriteLine("Notes synced successfully");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Ошибка в DownloadNotesFromServerAsync: {ex.Message}");
-                if (ex.InnerException != null)
-                    Console.WriteLine($"Внутренняя ошибка: {ex.InnerException.Message}");
-                throw new Exception("Ошибка синхронизации заметок server -> client", ex);
+                Console.WriteLine($"Note download failed: {ex.Message}");
+                throw new Exception("Note download error", ex);
             }
+        }
+        public static async Task DeleteEventAsync(string syncId)
+        {
+            var token = UserService.Instance.AuthToken;
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            Console.WriteLine($"Deleting event {syncId}");
+            var response = await _httpClient.DeleteAsync($"http://paevik.antonivanov23.thkit.ee/events/{syncId}");
+            Console.WriteLine($"Server response: {response.StatusCode}");
+            response.EnsureSuccessStatusCode();
+            Console.WriteLine("Event deleted from server");
+
+            App.HomePageViewModel.MarkForRefresh();
+            App.CalendarViewModel.MarkForRefresh();
         }
 
         public static async Task DeleteNoteAsync(string syncId)
         {
-            var token = UserService.Instance.AuthToken;;
+            var token = UserService.Instance.AuthToken;
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-            Console.WriteLine($"Отправка DELETE-запроса для SyncId={syncId}...");
+            Console.WriteLine($"Deleting note {syncId}");
             var response = await _httpClient.DeleteAsync($"http://paevik.antonivanov23.thkit.ee/notes/{syncId}");
-            Console.WriteLine($"Статус ответа сервера: {response.StatusCode}");
+            Console.WriteLine($"Server response: {response.StatusCode}");
             response.EnsureSuccessStatusCode();
-            Console.WriteLine("Заметка успешно удалена с сервера.");
+            Console.WriteLine("Note deleted from server");
 
-            App.HomePageViewModel.MarkForRefresh(); ////
+            App.HomePageViewModel.MarkForRefresh();
         }
 
         public static async Task ClearLocalDatabaseAsync()
@@ -437,8 +353,8 @@ namespace NutikasPaevik.Services
             UserService.Instance.UpdateLastSyncTime(default);
 
             App.DiaryViewModel.MarkForRefresh();
-            App.HomePageViewModel.MarkForRefresh(); ////
-            App.CalendarViewModel.MarkForRefresh(); ////
+            App.HomePageViewModel.MarkForRefresh();
+            App.CalendarViewModel.MarkForRefresh();
         }
 
         public static async Task ClearLocalEventsForCurrentUserAsync()
@@ -449,8 +365,8 @@ namespace NutikasPaevik.Services
             await dbContext.SaveChangesAsync();
 
             UserService.Instance.UpdateLastSyncTime(default);
-            App.HomePageViewModel.MarkForRefresh(); ////
-            App.CalendarViewModel.MarkForRefresh(); ////
+            App.HomePageViewModel.MarkForRefresh();
+            App.CalendarViewModel.MarkForRefresh();
         }
 
         public static async Task ClearLocalNotesForCurrentUserAsync()
@@ -461,8 +377,8 @@ namespace NutikasPaevik.Services
             await dbContext.SaveChangesAsync();
 
             UserService.Instance.UpdateLastSyncTime(default);
-            App.DiaryViewModel.MarkForRefresh(); ////
-            App.HomePageViewModel.MarkForRefresh(); ////
+            App.DiaryViewModel.MarkForRefresh();
+            App.HomePageViewModel.MarkForRefresh();
         }
     }
 }

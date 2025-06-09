@@ -216,7 +216,6 @@ namespace NutikasPaevik
 
         private View CreateStickerView(bool isEditing)
         {
-            // Заглушка для совместимости
             return new Label { Text = "StickerView not implemented", TextColor = Colors.Red };
         }
 

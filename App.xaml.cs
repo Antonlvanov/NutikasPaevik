@@ -1,8 +1,4 @@
-﻿using Microsoft.Maui.Controls;
-using Microsoft.Extensions.DependencyInjection;
-using NutikasPaevik.Database;
-using NutikasPaevik.Services;
-using CommunityToolkit.Maui.PlatformConfiguration.AndroidSpecific;
+﻿using NutikasPaevik.Services;
 
 namespace NutikasPaevik
 {
@@ -10,12 +6,9 @@ namespace NutikasPaevik
     {
         public static HttpClient HttpClient { get; private set; }
         public static DiaryViewModel DiaryViewModel { get; private set; }
-
         public static HomePageViewModel HomePageViewModel { get; private set; }
-
         public static CalendarViewModel CalendarViewModel { get; private set; }
         public static IServiceProvider Services { get; set; }
-
         public App()
         {
             InitializeComponent();
@@ -69,7 +62,6 @@ namespace NutikasPaevik
                         await Task.Delay(100);
                     }
                 });
-                System.Diagnostics.Debug.WriteLine("Ресурсы загружены.");
                 System.Diagnostics.Debug.WriteLine("Switching to AppShell.");
                 Current.MainPage = new AppShell();
                 System.Diagnostics.Debug.WriteLine("Switched to AppShell successfully.");
@@ -77,7 +69,8 @@ namespace NutikasPaevik
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"SwitchToMainApp Error: {ex.Message}");
-                Current.MainPage.DisplayAlert("Viga", $"Põhirakenduse laadimine ebaõnnestus: {ex.Message}", "OK");
+                Current.MainPage.DisplayAlert("Viga", $"Põhirakenduse laadimine ebaõnnestus: " +
+                    $"{ex.Message}", "OK");
             }
         }
     }

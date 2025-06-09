@@ -47,13 +47,20 @@
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
-                                <Label Text="Es" FontSize="16" TextColor="{DynamicResource TextColor}" HorizontalOptions="Center" Grid.Column="0" />
-                                <Label Text="Te" FontSize="16" TextColor="{DynamicResource TextColor}" HorizontalOptions="Center" Grid.Column="1" />
-                                <Label Text="Ko" FontSize="16" TextColor="{DynamicResource TextColor}" HorizontalOptions="Center" Grid.Column="2" />
-                                <Label Text="Ne" FontSize="16" TextColor="{DynamicResource TextColor}" HorizontalOptions="Center" Grid.Column="3" />
-                                <Label Text="Re" FontSize="16" TextColor="{DynamicResource TextColor}" HorizontalOptions="Center" Grid.Column="4" />
-                                <Label Text="La" FontSize="16" TextColor="{DynamicResource TextColor}" HorizontalOptions="Center" Grid.Column="5" />
-                                <Label Text="Pü" FontSize="16" TextColor="{DynamicResource TextColor}" HorizontalOptions="Center" Grid.Column="6" />
+                                <Label Text="Es" FontSize="16" TextColor="{DynamicResource TextColor}" 
+                                       HorizontalOptions="Center" Grid.Column="0" />
+                                <Label Text="Te" FontSize="16" TextColor="{DynamicResource TextColor}" 
+                                       HorizontalOptions="Center" Grid.Column="1" />
+                                <Label Text="Ko" FontSize="16" TextColor="{DynamicResource TextColor}" 
+                                       HorizontalOptions="Center" Grid.Column="2" />
+                                <Label Text="Ne" FontSize="16" TextColor="{DynamicResource TextColor}" 
+                                       HorizontalOptions="Center" Grid.Column="3" />
+                                <Label Text="Re" FontSize="16" TextColor="{DynamicResource TextColor}" 
+                                       HorizontalOptions="Center" Grid.Column="4" />
+                                <Label Text="La" FontSize="16" TextColor="{DynamicResource TextColor}" 
+                                       HorizontalOptions="Center" Grid.Column="5" />
+                                <Label Text="Pü" FontSize="16" TextColor="{DynamicResource TextColor}" 
+                                       HorizontalOptions="Center" Grid.Column="6" />
                             </Grid>
                             
                             <CollectionView ItemsSource="{Binding CalendarDays}"
@@ -71,17 +78,20 @@
                                             <Frame.GestureRecognizers>
                                                 <TapGestureRecognizer Tapped="OnDayTapped" />
                                             </Frame.GestureRecognizers>
-                                            <VerticalStackLayout HeightRequest="{Binding Source={x:Reference calendarPage}, Path=Height, Converter={StaticResource CalendarHeightConverter}}">
+                                            <VerticalStackLayout HeightRequest="{Binding Source={x:Reference calendarPage}, 
+                                                Path=Height, Converter={StaticResource CalendarHeightConverter}}">
                                                 <Label Text="{Binding Date.Day}"
                                                    FontSize="16"
-                                                   TextColor="{Binding IsCurrentMonth, Converter={StaticResource IsDayFromCurrentMonthToColorConverter}}"
+                                                   TextColor="{Binding IsCurrentMonth, 
+                                                    Converter={StaticResource IsDayFromCurrentMonthToColorConverter}}"
                                                    HorizontalOptions="Center"
                                                    VerticalOptions="Center" />
                                                 <VerticalStackLayout BindableLayout.ItemsSource="{Binding Events}"
                                                                  Spacing="1">
                                                     <BindableLayout.ItemTemplate>
                                                         <DataTemplate>
-                                                            <Frame BackgroundColor="{Binding Type, Converter={StaticResource EventTypeToColorConverter}}"
+                                                            <Frame BackgroundColor="{Binding Type, 
+                                                                Converter={StaticResource EventTypeToColorConverter}}"
                                                                    Padding="2"
                                                                    CornerRadius="3"
                                                                    Margin="0,0,0,0">

@@ -14,11 +14,6 @@ namespace NutikasPaevik
             InitializeComponent();
         }
 
-        public async void Test()
-        {
-            await UserService.Instance.ClearTokenAsync();
-        }
-
         private async void OnSyncEventsClientToServerClicked(object sender, EventArgs e)
         {
             try
@@ -37,19 +32,6 @@ namespace NutikasPaevik
             try
             {
                 await SyncService.DownloadEventsFromServerAsync();
-            }
-            catch (Exception ex)
-            {
-                await DisplayAlert("Viga", $"Sünkroniseerimine ebaõnnestus: {ex.Message}", "OK");
-            }
-        }
-
-        private async void OnSyncNotesClicked(object sender, EventArgs e)
-        {
-            try
-            {
-                await SyncService.SynchronizeNotesAsync();
-                await DisplayAlert("Info", "Märkmed sünkroniseeritud", "OK");
             }
             catch (Exception ex)
             {

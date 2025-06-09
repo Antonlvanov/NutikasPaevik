@@ -1,14 +1,10 @@
 ﻿using CommunityToolkit.Maui.Views;
-using Microsoft.EntityFrameworkCore;
 using NutikasPaevik.Database;
 using NutikasPaevik.Services;
-using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Linq;
 using System.Windows.Input;
-using Microsoft.Maui.Storage;
 using System.Collections.Specialized;
 
 namespace NutikasPaevik
@@ -98,45 +94,10 @@ namespace NutikasPaevik
             AppSettings.Instance.PropertyChanged += OnAppSettingsChanged;
         }
 
-        // target upd for changing notes cases
-        private void Notes_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        // setting upd flag
+        public void MarkForRefresh()
         {
-            if (e.Action == NotifyCollectionChangedAction.Add)
-            {
-                var newNote = (Note)e.NewItems[0];
-                var date = newNote.CreationTime.Date;
-                var notesByDate = NotesByDate.FirstOrDefault(n => n.Date == date);
-                if (notesByDate != null)
-                {
-                    notesByDate.Notes.Add(newNote);
-                    UpdateColumns(notesByDate);
-                }
-            }
-            else if (e.Action == NotifyCollectionChangedAction.Remove)
-            {
-                var oldNote = (Note)e.OldItems[0];
-                var date = oldNote.CreationTime.Date;
-                var notesByDate = NotesByDate.FirstOrDefault(n => n.Date == date);
-                if (notesByDate != null)
-                {
-                    notesByDate.Notes.Remove(oldNote);
-                    UpdateColumns(notesByDate);
-                }
-            }
-            else if (e.Action == NotifyCollectionChangedAction.Replace)
-            {
-                var oldNote = (Note)e.OldItems[0];
-                var newNote = (Note)e.NewItems[0];
-                var newDate = DateTime.Now;
-                var notesByDate = NotesByDate.FirstOrDefault(n => n.Date == oldNote.CreationTime.Date);
-                if (notesByDate != null)
-                {
-                    var noteIndex = notesByDate.Notes.IndexOf(oldNote);
-                    newNote.ModifyTime = newDate;
-                    notesByDate.Notes[noteIndex] = newNote;
-                    UpdateColumns(notesByDate);
-                }
-            }
+            _needsRefresh = true;
         }
 
         // if settings changed updating columns // obsolete
@@ -144,21 +105,11 @@ namespace NutikasPaevik
         {
             if (e.PropertyName == nameof(AppSettings.NoteDisplayStyle))
             {
-                // collectin not recreating rn
+                // collection not recreating rn
                 foreach (var group in NotesByDate)
                 {
                     UpdateColumns(group);
                 }
-            }
-        }
-
-        // 
-        public void SelectClosestDate()
-        {
-            if (NotesByDate.Any())
-            {
-                NotesForSelectedDate = NotesByDate.OrderBy(d => Math.Abs((d.Date - DateTime.Today).TotalDays)).First();
-                Debug.WriteLine($"SelectClosestDate: Selected {NotesForSelectedDate.Date:dd MMMM yyyy}");
             }
         }
 
@@ -171,6 +122,16 @@ namespace NutikasPaevik
                 _needsRefresh = false;
             }
             SelectClosestDate();
+        }
+
+        // 
+        public void SelectClosestDate()
+        {
+            if (NotesByDate.Any())
+            {
+                NotesForSelectedDate = NotesByDate.OrderBy(d => Math.Abs((d.Date - DateTime.Today).TotalDays)).First();
+                Debug.WriteLine($"SelectClosestDate: Selected {NotesForSelectedDate.Date:dd MMMM yyyy}");
+            }
         }
 
         // loading from db into main notes collection
@@ -212,7 +173,8 @@ namespace NutikasPaevik
                     else
                         notesByDate.RightColumnNotes.Add(note);
                 }
-                Debug.WriteLine($"UpdateColumnsFromNotes: Date={notesByDate.Date:dd MMMM yyyy}, Left={notesByDate.LeftColumnNotes.Count}, Right={notesByDate.RightColumnNotes.Count}");
+                Debug.WriteLine($"UpdateColumnsFromNotes: Date={notesByDate.Date:dd MMMM yyyy}, " +
+                    $"Left={notesByDate.LeftColumnNotes.Count}, Right={notesByDate.RightColumnNotes.Count}");
             }
             catch (Exception ex)
             {
@@ -264,6 +226,45 @@ namespace NutikasPaevik
             {
                 Debug.WriteLine($"UpdateNotesByDate Error: {ex.Message}");
                 Application.Current?.MainPage?.DisplayAlert("Viga", $"Ei saanud märkmeid grupeerida: {ex.Message}", "OK");
+            }
+        }
+
+        // target collections upd for changing notes cases
+        private void Notes_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action == NotifyCollectionChangedAction.Add)
+            {
+                var newNote = (Note)e.NewItems[0];
+                var notesByDate = NotesByDate.FirstOrDefault(n => n.Date == newNote.CreationTime.Date);
+                if (notesByDate != null)
+                {
+                    notesByDate.Notes.Add(newNote);
+                    UpdateColumns(notesByDate);
+                }
+            }
+            else if (e.Action == NotifyCollectionChangedAction.Remove)
+            {
+                var oldNote = (Note)e.OldItems[0];
+                var notesByDate = NotesByDate.FirstOrDefault(n => n.Date == oldNote.CreationTime.Date);
+                if (notesByDate != null)
+                {
+                    notesByDate.Notes.Remove(oldNote);
+                    UpdateColumns(notesByDate);
+                }
+            }
+            else if (e.Action == NotifyCollectionChangedAction.Replace)
+            {
+                var oldNote = (Note)e.OldItems[0];
+                var newNote = (Note)e.NewItems[0];
+                var newDate = DateTime.Now;
+                var notesByDate = NotesByDate.FirstOrDefault(n => n.Date == oldNote.CreationTime.Date);
+                if (notesByDate != null)
+                {
+                    var noteIndex = notesByDate.Notes.IndexOf(oldNote);
+                    newNote.ModifyTime = newDate;
+                    notesByDate.Notes[noteIndex] = newNote;
+                    UpdateColumns(notesByDate);
+                }
             }
         }
 
@@ -322,12 +323,6 @@ namespace NutikasPaevik
                 Debug.WriteLine($"DeleteNote Error: {ex.Message}");
                 await Application.Current.MainPage.DisplayAlert("Viga", $"Ei saanud märkmeid kustutada: {ex.Message}", "OK");
             }
-        }
-
-        // setting upd flag
-        public void MarkForRefresh()
-        {
-            _needsRefresh = true;
         }
 
         // property changed handler

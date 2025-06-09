@@ -17,9 +17,10 @@ namespace NutikasPaevik
 
         private async void OnRegisterClicked(object sender, EventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(UsernameEntry.Text) || string.IsNullOrWhiteSpace(EmailEntry.Text) || string.IsNullOrWhiteSpace(PasswordEntry.Text))
+            if (string.IsNullOrWhiteSpace(UsernameEntry.Text) || string.IsNullOrWhiteSpace(EmailEntry.Text) 
+                || string.IsNullOrWhiteSpace(PasswordEntry.Text))
             {
-                await DisplayAlert("Ошибка", "Заполните все поля", "OK");
+                await DisplayAlert("Viga", "Täitke kõik väljad", "OK");
                 return;
             }
 
@@ -37,17 +38,17 @@ namespace NutikasPaevik
                 var responseContent = await response.Content.ReadAsStringAsync();
                 if (response.IsSuccessStatusCode)
                 {
-                    await DisplayAlert("Успех", "Регистрация прошла успешно!", "OK");
+                    await DisplayAlert("Edu", "Registreerimine oli edukas!", "OK");
                     await Navigation.PopAsync();
                 }
                 else
                 {
-                    await DisplayAlert("Ошибка", $"Не удалось зарегистрироваться: {responseContent}", "OK");
+                    await DisplayAlert("Viga", $"Serveri viga regisreerimisel: {responseContent}", "OK");
                 }
             }
             catch (Exception ex)
             {
-                await DisplayAlert("Ошибка", $"Произошла ошибка: {ex.Message}", "OK");
+                await DisplayAlert("Viga", $"Viga: {ex.Message}", "OK");
             }
         }
     }

@@ -6,11 +6,13 @@
              BackgroundColor="{DynamicResource PrimaryBackgroundColor}"
              Shell.FlyoutBehavior="Disabled">
     <StackLayout Padding="20" Spacing="10" VerticalOptions="Center" WidthRequest="300">
-        <Label Text="Sisestage andmed" Margin="0,0,0,10" TextColor="{DynamicResource TextColor}" FontSize="18" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Start"/>
+        <Label Text="Sisestage andmed" Margin="0,0,0,10" TextColor="{DynamicResource TextColor}"
+               FontSize="18" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Start"/>
         <Entry x:Name="UsernameEntry" Placeholder="Kasutajanimi" />
         <Entry x:Name="EmailEntry" Placeholder="Email" Keyboard="Email" />
         <Entry x:Name="PasswordEntry" Placeholder="Parool" IsPassword="True" />
-        <Button Text="Registreeri" Clicked="OnRegisterClicked" Margin="0,10,0,0" WidthRequest="100" TextColor="{DynamicResource TextColor}" 
+        <Button Text="Registreeri" Clicked="OnRegisterClicked" Margin="0,10,0,0" WidthRequest="100" 
+                TextColor="{DynamicResource TextColor}" 
              BackgroundColor="{DynamicResource ButtonBackgroundColor}"/>
     </StackLayout>
 </ContentPage>

@@ -1,11 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Maui.Controls.Hosting;
 using CommunityToolkit.Maui;
 using NutikasPaevik.Database;
-using Microsoft.Maui.LifecycleEvents;
-using NutikasPaevik.Services;
 
 namespace NutikasPaevik
 {
@@ -28,7 +24,9 @@ namespace NutikasPaevik
             builder.Services.AddDbContext<AppDbContext>(options =>
                 options.UseSqlite($"Data Source={dbPath}"), ServiceLifetime.Scoped);
 
-            builder.Services.AddSingleton<IServiceScopeFactory>(provider => provider.GetRequiredService<IServiceProvider>() as IServiceScopeFactory);
+            builder.Services.AddSingleton<IServiceScopeFactory>
+                (provider => provider.GetRequiredService<IServiceProvider>()
+                as IServiceScopeFactory);
             builder.Services.AddSingleton<DiaryViewModel>();
             builder.Services.AddSingleton<PlannerViewModel>();
             builder.Services.AddSingleton<CalendarViewModel>();
@@ -65,3 +63,11 @@ namespace NutikasPaevik
         }
     }
 }
+
+
+
+
+
+
+
+

@@ -2,7 +2,6 @@
 using NutikasPaevik.Services;
 using System.ComponentModel;
 using System.Diagnostics;
-using Microsoft.Maui.Controls;
 
 namespace NutikasPaevik
 {

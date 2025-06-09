@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
+﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Maui.Controls;
 using NutikasPaevik.Database;
 
 namespace NutikasPaevik

@@ -41,7 +41,8 @@
                             <HorizontalStackLayout Spacing="5"
                                                   HorizontalOptions="FillAndExpand">
                                 <VerticalStackLayout x:Name="LeftColumn"
-                                                    WidthRequest="{Binding Source={x:Reference page}, Path=Width, Converter={StaticResource HalfWidthConverter}}"
+                                                    WidthRequest="{Binding Source={x:Reference page}, Path=Width, 
+                                    Converter={StaticResource HalfWidthConverter}}"
                                                     Spacing="5"
                                                     HorizontalOptions="StartAndExpand"
                                                     BindableLayout.ItemsSource="{Binding LeftColumnNotes}">
@@ -49,14 +50,16 @@
                                         <DataTemplate>
                                             <ContentView Content="{Binding ., Converter={StaticResource NoteToViewConverter}}">
                                                 <ContentView.GestureRecognizers>
-                                                    <TapGestureRecognizer Command="{Binding Source={x:Reference page}, Path=BindingContext.OpenNoteCommand}" CommandParameter="{Binding .}" />
+                                                    <TapGestureRecognizer Command="{Binding Source={x:Reference page}, 
+                                                        Path=BindingContext.OpenNoteCommand}" CommandParameter="{Binding .}" />
                                                 </ContentView.GestureRecognizers>
                                             </ContentView>
                                         </DataTemplate>
                                     </BindableLayout.ItemTemplate>
                                 </VerticalStackLayout>
                                 <VerticalStackLayout x:Name="RightColumn"
-                                                    WidthRequest="{Binding Source={x:Reference page}, Path=Width, Converter={StaticResource HalfWidthConverter}}"
+                                                    WidthRequest="{Binding Source={x:Reference page}, Path=Width, 
+                                    Converter={StaticResource HalfWidthConverter}}"
                                                     Spacing="5"
                                                     HorizontalOptions="StartAndExpand"
                                                     BindableLayout.ItemsSource="{Binding RightColumnNotes}">
@@ -64,7 +67,8 @@
                                         <DataTemplate>
                                             <ContentView Content="{Binding ., Converter={StaticResource NoteToViewConverter}}">
                                                 <ContentView.GestureRecognizers>
-                                                    <TapGestureRecognizer Command="{Binding Source={x:Reference page}, Path=BindingContext.OpenNoteCommand}" CommandParameter="{Binding .}" />
+                                                    <TapGestureRecognizer Command="{Binding Source={x:Reference page}, 
+                                                        Path=BindingContext.OpenNoteCommand}" CommandParameter="{Binding .}" />
                                                 </ContentView.GestureRecognizers>
                                             </ContentView>
                                         </DataTemplate>

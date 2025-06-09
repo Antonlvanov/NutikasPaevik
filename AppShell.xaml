@@ -23,7 +23,8 @@
                 <Setter Property="FontSize" Value="12" />
                 <Setter Property="FontAttributes" Value="Bold" />
                 <Setter Property="Padding" Value="0" />
-                <Setter Property="ImageSource" Value="{Binding Source={RelativeSource Self}, Path=ImageSource}" />
+                <Setter Property="ImageSource" Value="{Binding Source={RelativeSource Self}, 
+                    Path=ImageSource}" />
                 <Setter Property="VerticalOptions" Value="Center" />
                 <Setter Property="HorizontalOptions" Value="Center" />
                 <Style.Triggers>
@@ -56,18 +57,6 @@
                    VerticalOptions="Center"
                    HorizontalOptions="Start"
                    BackgroundColor="{DynamicResource PrimaryBackgroundColor}">
-                    <VisualStateManager.VisualStateGroups>
-                        <VisualStateGroupList>
-                            <VisualStateGroup x:Name="CommonStates">
-                                <VisualState x:Name="Normal" />
-                                <VisualState x:Name="Selected">
-                                    <VisualState.Setters>
-                                        <Setter Property="TextColor" Value="{DynamicResource AccentColor}" />
-                                    </VisualState.Setters>
-                                </VisualState>
-                            </VisualStateGroup>
-                        </VisualStateGroupList>
-                    </VisualStateManager.VisualStateGroups>
                 </Label>
             </Grid>
         </DataTemplate>
